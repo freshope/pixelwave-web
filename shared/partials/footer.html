@@ -1,0 +1,13 @@
+<!--
+  공통 푸터 템플릿. 각 사이트의 HTML 에 인라인으로 복사해서 사용.
+  변수: {SITE_NAME}, {PRIVACY_PATH}, {TERMS_PATH}, {SUPPORT_EMAIL}
+-->
+<footer class="site-footer">
+  <div>© <span id="year"></span> {SITE_NAME}. All rights reserved.</div>
+  <nav>
+    <a href="{PRIVACY_PATH}">개인정보처리방침</a>
+    <a href="{TERMS_PATH}">서비스 이용약관</a>
+    <a href="mailto:{SUPPORT_EMAIL}">문의</a>
+  </nav>
+</footer>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>

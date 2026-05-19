@@ -1,0 +1,5 @@
+# Cloudflare Pages redirect rules for pixelwave.app (hub).
+# 당분간 루트 도메인 접속을 invest-note 사이트로 보낸다.
+# 새 프로젝트가 늘어나면 hub 를 진짜 허브 페이지로 바꿀 것.
+
+/*  https://invest-note.pixelwave.app/:splat  301
