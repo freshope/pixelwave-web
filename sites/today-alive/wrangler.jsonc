@@ -1,0 +1,10 @@
+// Cloudflare Workers (Static Assets) 배포 설정.
+// CF 대시보드의 deploy command 가 `npx wrangler versions upload` 일 때 필요.
+// 이 파일은 wrangler 가 자동으로 자산 업로드 대상에서 제외한다.
+{
+  "name": "pixelwave-today-alive",
+  "compatibility_date": "2026-05-19",
+  "assets": {
+    "directory": "."
+  }
+}
