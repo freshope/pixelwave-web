@@ -4,3 +4,6 @@ dist/
 .cache/
 .env
 .env.local
+
+# 심사용 데모 영상 등 대용량 미디어는 R2 등 외부 호스팅 사용
+sites/*/review/
