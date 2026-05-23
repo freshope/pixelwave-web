@@ -5,7 +5,7 @@
 // 그 외 경로는 모두 정적 자산으로 fall-through 한다.
 
 const IOS_UA_MARKERS = ["iPhone", "iPad", "iPod"];
-const IOS_STORE_URL = "https://apps.apple.com/app/id6768927444";
+const IOS_STORE_URL = "https://apps.apple.com/kr/app/id6768927444";
 const ANDROID_STORE_URL =
   "https://play.google.com/store/apps/details?id=app.pixelwave.todayalive";
 
