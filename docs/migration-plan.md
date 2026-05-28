@@ -240,8 +240,7 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 - [ ] 기존 `sites/*/index.html`, `privacy.html`, `terms.html`, `account-deletion.html` 을 각각 `app/(site)/<path>/page.tsx` (또는 MDX) 로 이식.
 - [ ] `shared/styles/base.css` → 전역 스타일로 이전. `shared/partials/footer.html` → `<Footer />` 컴포넌트로.
 - [ ] `today-alive/invite/route.ts` 작성: UA 검사 → 302 (기존 `_worker.js` 동작 동일).
-- [ ] `pixelwave.app` 의 기존 "전체 → invest-note 301" 정책을 **유지할지 결정**.
-  - 허브 페이지가 아직 비어 있으므로 Phase 3 까지는 그대로 redirect 유지를 권고.
+- [x] `pixelwave.app` 의 기존 "전체 → invest-note 301" 정책 **Phase 3 까지 유지**. proxy.ts 가 `pixelwave.app` / `www.pixelwave.app` 호스트 path+query 보존하여 301. 검증용 `next.pixelwave.app` 은 redirect 제외(placeholder 노출).
 - [ ] Dockerfile 작성 (Node 22+ Alpine, standalone 출력).
 - [ ] GitHub Actions 빌드/푸시 워크플로 작성 → `registry.pixelwave.app/pixelwave-web:<sha>` 로 push.
 - [ ] Coolify 에 신규 앱 등록, 자체 registry pull 설정, `next.pixelwave.app` 도메인 매핑, 배포.
@@ -370,3 +369,4 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 - 2026-05-28: **Phase 1.2 완료.** `src/proxy.ts` (Next.js 16 의 `middleware` → `proxy` 새 컨벤션, named export `proxy`) 에서 host 기반 prefix rewrite. `src/app/{hub,invest-note,today-alive}/page.tsx` placeholder, `src/app/page.tsx` 제거. `shared/styles/base.css` → `src/app/globals.css` 머지 (Tailwind v4 와 공존). `src/components/Footer.tsx` 작성 (props: siteName/privacyHref/termsHref/supportEmail). 8개 호스트/직접경로 시나리오 curl 검증 통과. ⚠️ docs §3.1 의 route group `()` 표기는 잘못된 가정이라 일반 폴더로 정정.
 - 2026-05-28: **Phase 1.3 완료.** today-alive 정적 3 페이지(index/privacy/terms) 이식 + `/invite` UA 분기 route handler (iOS/Android/빈 UA 분기 302). `next.config.ts` 에 `.html` → 깨끗 URL permanent redirect(`privacy|terms|account-deletion`). `Footer` 를 `links` 배열 받는 형태로 일반화 — page 별로 다른 nav (landing: privacy+terms / privacy+terms 서브: 홈+상대). 8건 curl (4 페이지 + 3 UA + 2 .html) 모두 통과.
 - 2026-05-28: **Phase 1.4 완료.** invest-note 정적 4 페이지(index/privacy/terms/account-deletion) 이식. account-deletion 의 mailto 는 기존 URL-encoded subject(`[투자노트] 계정 삭제 요청`) 그대로 보존. 4 페이지 + 3 .html → 깨끗 URL redirect 검증 통과.
+- 2026-05-28: **Phase 1.5 완료.** proxy.ts 에 `pixelwave.app`/`www.pixelwave.app` → `https://invest-note.pixelwave.app{path}{search}` 301 추가 (Phase 3 진짜 hub 생기기 전까지 유지, 검증용 `next.pixelwave.app` 은 제외). 6가지 시나리오 curl 통과.
