@@ -39,12 +39,12 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          push: true
           platforms: linux/amd64
-          # registry:2 가 buildx 의 attestation manifest 를 거부해 "unknown: unknown error" 가 난다.
-          # 단일 image manifest 만 push 한다.
+          # registry:2 가 buildx 의 OCI attestation/index manifest 를 거부해 "unknown: unknown error" 가 난다.
+          # provenance/sbom 끄고 + oci-mediatypes=false 로 docker schema2 단일 image manifest 만 push.
           provenance: false
           sbom: false
+          outputs: type=registry,oci-mediatypes=false
           tags: |
             ${{ secrets.REGISTRY_URL }}/pixelwave-web:${{ steps.meta.outputs.sha }}
             ${{ secrets.REGISTRY_URL }}/pixelwave-web:${{ steps.meta.outputs.branch }}
