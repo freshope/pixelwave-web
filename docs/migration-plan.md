@@ -265,18 +265,17 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 **목표**: 3개 운영 도메인을 Cloudflare Workers → Coolify 로 전환.
 
 작업:
-- [ ] Coolify 앱에 운영 도메인 3개 모두 추가, TLS 발급 확인.
-- [ ] Cloudflare DNS 레코드 변경 (Workers → Coolify IP/호스트).
-- [ ] CF 프록시(주황 구름) 유지 여부 결정.
-  - 유지 시 SSR 응답에 적절한 `Cache-Control` 부여.
-  - off 시 그레이 클라우드로 변경.
-- [ ] 기존 CF Worker 는 즉시 삭제하지 않고 **1주일 보존**. (롤백 안전망)
+- [x] Coolify 앱에 운영 도메인 (today-alive·invest-note·pixelwave.app·www.pixelwave.app) 추가, Traefik LE 발급 확인.
+- [x] Cloudflare DNS 레코드 변경: 각 도메인의 CF Workers/Pages Custom Domain 해제 후 A(또는 apex→www CNAME) 158.247.208.173, **Proxy OFF (gray cloud)**.
+- [x] CF 프록시는 **OFF 로 시작** 결정. 안정화 후 ON 검토 (Phase 4 이후).
+- [ ] 기존 CF Worker/Pages 는 즉시 삭제하지 않고 **1주일 보존** (rollback 안전망). Phase 5 정리에서 제거.
 
 검증:
-- 3개 운영 도메인 모두 정상 응답, TLS 유효.
-- `/invite` 동작 확인 (실 단말 또는 UA 위조 curl).
-- privacy/terms/account-deletion 등 외부에서 인입될 가능성 있는 모든 경로가 정상.
-- 404/500 로그 모니터링 24시간.
+- ✅ 3개 운영 도메인 + www 모두 HTTP/2 200(또는 301), TLS 유효.
+- ✅ today-alive `/invite` UA 분기 iOS→App Store / Android→Play Store / 빈 UA→Play Store.
+- ✅ privacy / terms / account-deletion / .html → 깨끗 URL 308 같은 host 보존.
+- ✅ apex+www → invest-note 301 path+query 보존, http→https 302 force.
+- ⏳ 404/500 로그 모니터링 24시간 (Task #19).
 
 산출물: 운영 도메인의 Next.js/Coolify 전환 완료.
 
@@ -378,3 +377,4 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 - 2026-05-28: **Phase 1.7 작성 완료.** `.github/workflows/build.yml` — main/develop push 트리거, `environment: production` 의 REGISTRY_URL/USERNAME/PASSWORD secrets 사용, buildx 로 linux/amd64 빌드 후 `registry.pixelwave.app/pixelwave-web:<short-sha>` 와 `:<branch>` 태그로 push. gha cache(`type=gha,mode=max`). 실제 트리거는 GitHub 푸시 후 검증 필요(미push).
 - 2026-05-28: GHA push 실패 → 두 단계 fix. (1) provenance/sbom 끔 — buildx attestation manifest 가 registry:2 와 비호환. (2) `outputs: type=registry,oci-mediatypes=false` — docker schema2 단일 manifest 강제. (3) **결정적 fix**: registry 측 `REGISTRY_STORAGE_S3_CHUNKSIZE=104857600` (100MB) 추가. node 베이스 layer 가 default chunksize(10MB) 초과해 multipart upload 사용 시 R2 의 part listing 즉시 일관성 미보장으로 "s3aws: Path not found" 발생 → chunksize 키워 single-part 강제로 해결.
 - 2026-05-28: **Phase 1.8 완료. Phase 1 종료.** Coolify 의 `pixelwave-web` 프로젝트에 Docker Image 리소스로 `registry.pixelwave.app/pixelwave-web:develop` 등록, port 3000 노출, `next.pixelwave.app` 도메인 매핑, NODE_ENV/NEXT_TELEMETRY_DISABLED env 만 명시. Traefik LE 발급 통과, HTTP/2 200. 외부 curl 10건(host→site / 직접 prefix / privacy/terms/account-deletion / /invite UA iOS·Android / .html redirect) 전부 통과. 운영 도메인(pixelwave.app·invest-note·today-alive) host 매핑 검증은 Phase 2 cutover 후에만 가능.
+- 2026-05-28: **Phase 2 (DNS cutover) 통신 검증 통과.** today-alive → invest-note → hub(apex+www) 순서로 cutover. 각 도메인마다 (1) Coolify Domains 매핑 (2) CF Workers/Pages Custom Domain 해제 (3) CF DNS A/CNAME 으로 158.247.208.173·Proxy OFF (4) Traefik LE 발급 (5) 외부 curl 검증. today-alive 7건/invest-note 8건/hub 7건 통과. mailto subject 인코딩·canonical link·http→https force·301 path+query 보존 모두 확인. CF 잔재(Worker/Pages/cloudflare branches)는 1주일 후 Phase 5 에서 정리. 24시간 운영 모니터링 진행 중(Task #19).
