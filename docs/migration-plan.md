@@ -247,7 +247,7 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 - [x] `pixelwave.app` 의 기존 "전체 → invest-note 301" 정책 **Phase 3 까지 유지**. proxy.ts 가 `pixelwave.app` / `www.pixelwave.app` 호스트 path+query 보존하여 301. 검증용 `next.pixelwave.app` 은 redirect 제외(placeholder 노출).
 - [ ] Dockerfile 작성 (Node 22+ Alpine, standalone 출력).
 - [ ] GitHub Actions 빌드/푸시 워크플로 작성 → `registry.pixelwave.app/pixelwave-web:<sha>` 로 push.
-- [ ] Coolify 에 신규 앱 등록, 자체 registry pull 설정, `next.pixelwave.app` 도메인 매핑, 배포.
+- [x] Coolify 에 신규 앱 등록 (Docker Image 리소스, `registry.pixelwave.app/pixelwave-web:develop`), `next.pixelwave.app` 도메인 매핑, 배포 완료. 10건 외부 curl 검증 통과 (host→site 분기 / direct prefix / privacy/terms/account-deletion / /invite UA / .html redirect / TLS).
 
 검증:
 - `next.pixelwave.app/` 가 host 기반으로 hub 콘텐츠를 보여준다 (또는 임시 host override 로 invest-note/today-alive 도 확인 가능).
@@ -377,3 +377,4 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 - 2026-05-28: **Phase 1.6 완료.** Multi-stage Dockerfile (node:22-alpine, deps/builder/runner) + standalone 출력 사용. NODE_OPTIONS=--max-old-space-size=1024, non-root nextjs 유저, PORT=3000. `.dockerignore` 로 docs/sites/shared/memo.txt/README/.git 제외. 빌드: 76.5MB (compressed) / 306MB (uncompressed), arch=amd64 (Coolify 호스트 호환). 컨테이너 실행 후 host 위조 + UA 분기 + .html redirect 전부 dev 와 동일 동작 확인.
 - 2026-05-28: **Phase 1.7 작성 완료.** `.github/workflows/build.yml` — main/develop push 트리거, `environment: production` 의 REGISTRY_URL/USERNAME/PASSWORD secrets 사용, buildx 로 linux/amd64 빌드 후 `registry.pixelwave.app/pixelwave-web:<short-sha>` 와 `:<branch>` 태그로 push. gha cache(`type=gha,mode=max`). 실제 트리거는 GitHub 푸시 후 검증 필요(미push).
 - 2026-05-28: GHA push 실패 → 두 단계 fix. (1) provenance/sbom 끔 — buildx attestation manifest 가 registry:2 와 비호환. (2) `outputs: type=registry,oci-mediatypes=false` — docker schema2 단일 manifest 강제. (3) **결정적 fix**: registry 측 `REGISTRY_STORAGE_S3_CHUNKSIZE=104857600` (100MB) 추가. node 베이스 layer 가 default chunksize(10MB) 초과해 multipart upload 사용 시 R2 의 part listing 즉시 일관성 미보장으로 "s3aws: Path not found" 발생 → chunksize 키워 single-part 강제로 해결.
+- 2026-05-28: **Phase 1.8 완료. Phase 1 종료.** Coolify 의 `pixelwave-web` 프로젝트에 Docker Image 리소스로 `registry.pixelwave.app/pixelwave-web:develop` 등록, port 3000 노출, `next.pixelwave.app` 도메인 매핑, NODE_ENV/NEXT_TELEMETRY_DISABLED env 만 명시. Traefik LE 발급 통과, HTTP/2 200. 외부 curl 10건(host→site / 직접 prefix / privacy/terms/account-deletion / /invite UA iOS·Android / .html redirect) 전부 통과. 운영 도메인(pixelwave.app·invest-note·today-alive) host 매핑 검증은 Phase 2 cutover 후에만 가능.
