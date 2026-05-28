@@ -7,7 +7,6 @@ type Site = (typeof SITES)[number];
 const SITE_BY_HOST: Record<string, Site> = {
   "pixelwave.app": "hub",
   "www.pixelwave.app": "hub",
-  "next.pixelwave.app": "hub",
   "invest-note.pixelwave.app": "invest-note",
   "today-alive.pixelwave.app": "today-alive",
 };

@@ -382,3 +382,6 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 - 2026-05-28: **24h 운영 모니터링 skip 결정.** 외부 22건 curl 검증으로 통신 정합성 확인됨. Task #19 closed.
 - 2026-05-28: **Phase 5 정리 1차 진행.** `sites/`(hub/invest-note/today-alive 정적 + wrangler/_worker/_redirects/.assetsignore), `shared/`(base.css·footer.html), `docs/legacy-readme.md` git 에서 제거. `README.md` 를 Coolify/Next.js 운영 가이드로 새로 작성. `.gitignore` 의 legacy CF artifacts 라인 제거. scaffold 동봉 `public/*.svg` 5개 제거. CF Workers/Pages 콘솔에서 프로젝트 자체 삭제는 사용자 작업으로 남음.
 - 2026-05-28: **Postgres 백업 활성.** Coolify 의 글로벌 S3 Storages 에 `pixelwave-r2-backups` (R2 `pixelwave-backups` 버킷) 등록 후 `postgres-shared` Backups 탭이 이를 참조. credential 중앙 관리. 튜닝값은 사용자 결정으로 보류 → Task #21.
+- 2026-05-28: **CF DNS 운영 도메인 A → CNAME 전환 완료** (apex `pixelwave.app` 만 A `158.247.208.173` 유지, 서브도메인은 CNAME → apex). 호스트 IP 변경 시 단일 갱신점.
+- 2026-05-28: **`api.invest-note.pixelwave.app` TLS 미커버 해소** (사용자 측 처리). 마이그레이션 범위 외 백엔드 도메인.
+- 2026-05-28: **staging 사용 안 함 결정.** `next.pixelwave.app` 도메인 폐기. `proxy.ts` 의 SITE_BY_HOST 에서 매핑 제거. 후속 사용자 작업: Coolify pixelwave-web 앱 Domains 에서 next.pixelwave.app 제거 / CF DNS 의 `next` 레코드 제거 / GitHub OAuth App callback URL 을 운영 도메인으로 변경 (Phase 3 NextAuth 셋업 시 처리). develop staging 없이 로컬 dev → main 머지 → 운영 배포 흐름으로 운영.
