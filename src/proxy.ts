@@ -26,7 +26,14 @@ export function proxy(req: NextRequest) {
   const hostname = host.split(":")[0].toLowerCase();
 
   if (HUB_REDIRECT_HOSTS.has(hostname)) {
-    const target = `${HUB_REDIRECT_TARGET_ORIGIN}${req.nextUrl.pathname}${req.nextUrl.search}`;
+    const pathname = req.nextUrl.pathname;
+    // 어드민은 hub 의 정본 도메인에서 동작해야 하므로 redirect 가 가로채지 않게 hub 로 rewrite.
+    if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+      const url = req.nextUrl.clone();
+      url.pathname = `/hub${pathname}`;
+      return NextResponse.rewrite(url);
+    }
+    const target = `${HUB_REDIRECT_TARGET_ORIGIN}${pathname}${req.nextUrl.search}`;
     return NextResponse.redirect(target, 301);
   }
 
