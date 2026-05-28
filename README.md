@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# pixelwave-web
 
-## Getting Started
+Pixelwave 산하 사이트들의 통합 Next.js 앱. host 헤더 기반으로 한 컨테이너에서 사이트별 라우팅을 분기 서빙한다.
 
-First, run the development server:
+## 도메인 매핑
+
+| 도메인 | 라우팅 |
+|---|---|
+| `pixelwave.app`, `www.pixelwave.app` | `invest-note.pixelwave.app` 로 301 (임시 — Phase 3 의 진짜 hub 등장 전까지) |
+| `invest-note.pixelwave.app` | `src/app/invest-note/*` (랜딩 + privacy / terms / account-deletion) |
+| `today-alive.pixelwave.app` | `src/app/today-alive/*` (랜딩 + privacy / terms + `/invite` UA 분기) |
+| `next.pixelwave.app` | 검증용. host 가 매핑되지 않으면 hub placeholder 노출 |
+
+`src/proxy.ts` 가 host 헤더로 site 를 판별, path 앞에 `/<site>` prefix 를 붙여 rewrite (Next.js 16 의 `middleware` → `proxy` 컨벤션).
+
+## 로컬 개발
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev              # http://localhost:3100/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+host 별 라우팅 검증:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+curl -H 'Host: invest-note.pixelwave.app' http://localhost:3100/
+curl -H 'Host: today-alive.pixelwave.app' -A 'iPhone' http://localhost:3100/invite
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 배포 흐름
 
-## Learn More
+```
+git push (main|develop)
+  ↓
+GitHub Actions  (.github/workflows/build.yml)
+  ↓ docker buildx (linux/amd64, OCI manifest off)
+registry.pixelwave.app/pixelwave-web:<short-sha>  +  :<branch>
+  ↓ docker pull
+Coolify (pixelwave-web 프로젝트) → Traefik LE → 4개 도메인
+```
 
-To learn more about Next.js, take a look at the following resources:
+자세한 인프라·결정 사항은 [`docs/migration-plan.md`](docs/migration-plan.md) 참고.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 디렉토리 구조
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+  proxy.ts                  # host → site prefix rewrite
+  app/
+    layout.tsx, globals.css
+    hub/                    # pixelwave.app placeholder
+    invest-note/            # invest-note.pixelwave.app
+    today-alive/            # today-alive.pixelwave.app
+      invite/route.ts       # iOS → App Store / 그 외 → Play Store
+  components/
+    Footer.tsx
+Dockerfile                  # node:22-alpine multi-stage, standalone
+next.config.ts              # output: 'standalone', .html → 깨끗 URL redirect
+```
 
-## Deploy on Vercel
+## 운영 인프라
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **호스트**: Coolify (자체 호스팅)
+- **DB**: 공유 Postgres (`postgres-shared`), 앱별 분리 DB/유저
+- **이미지 레지스트리**: 자체 호스팅 `registry.pixelwave.app` (Cloudflare R2 백엔드)
+- **DB 백업**: Cloudflare R2 `pixelwave-backups` daily, 14일 retention

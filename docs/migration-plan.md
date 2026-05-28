@@ -127,7 +127,7 @@ users        (id, github_id, role)                  -- v1 은 admin 1명
 - **공유 Postgres 인스턴스 1개**: 컨테이너 이름 `postgres-shared`, 향후 다른 프로젝트도 같은 인스턴스에 별도 DB/유저로 들어온다.
   - 이 마이그레이션용 DB/유저: `pixelwave` / `pixelwave`.
   - 인스턴스는 **외부 노출 OFF**, Coolify 내부 네트워크 한정.
-  - 백업: **Cloudflare R2 (S3 호환) 로 daily 자동 백업**. 별도 버킷 `pixelwave-backups`, registry 토큰과 분리된 별도 R2 토큰(`pixelwave-backups-rw`, write 권한만 부여). 백업은 인스턴스 단위(한 dump 안에 모든 DB).
+  - 백업: **Cloudflare R2 daily 자동 백업**. 별도 버킷 `pixelwave-backups`, registry 토큰과 분리된 별도 R2 토큰(`pixelwave-backups-rw`). credential 은 **Coolify 의 글로벌 S3 Storages** 에 `pixelwave-r2-backups` 로 등록해 두고, Postgres 리소스의 Backups 탭이 이걸 참조한다 — postgres-shared env 에 R2 키가 노출되지 않는다. 백업은 인스턴스 단위.
 - `postgresql.conf` 기준값 (공유 인스턴스 고려해 `max_connections` 상향):
   ```
   shared_buffers = 256MB
@@ -182,6 +182,10 @@ REGISTRY_STORAGE_S3_REGION=auto
 REGISTRY_STORAGE_S3_BUCKET=pixelwave-registry
 REGISTRY_STORAGE_S3_REGIONENDPOINT=https://<account-id>.r2.cloudflarestorage.com
 REGISTRY_STORAGE_S3_FORCEPATHSTYLE=true
+# R2 의 S3 API 가 multipart upload 의 part listing 일관성을 즉시 보장하지 않아
+# registry:2 의 multipart upload 가 final PUT 단계에서 "Path not found" 로 실패한다.
+# 단일 PUT 한도(100MB) 안에서 모든 layer 가 들어가도록 chunksize 를 100MB 로 설정한다.
+REGISTRY_STORAGE_S3_CHUNKSIZE=104857600
 REGISTRY_AUTH=htpasswd
 REGISTRY_AUTH_HTPASSWD_REALM=Registry
 REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
@@ -243,7 +247,7 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 - [x] `pixelwave.app` 의 기존 "전체 → invest-note 301" 정책 **Phase 3 까지 유지**. proxy.ts 가 `pixelwave.app` / `www.pixelwave.app` 호스트 path+query 보존하여 301. 검증용 `next.pixelwave.app` 은 redirect 제외(placeholder 노출).
 - [ ] Dockerfile 작성 (Node 22+ Alpine, standalone 출력).
 - [ ] GitHub Actions 빌드/푸시 워크플로 작성 → `registry.pixelwave.app/pixelwave-web:<sha>` 로 push.
-- [ ] Coolify 에 신규 앱 등록, 자체 registry pull 설정, `next.pixelwave.app` 도메인 매핑, 배포.
+- [x] Coolify 에 신규 앱 등록 (Docker Image 리소스, `registry.pixelwave.app/pixelwave-web:develop`), `next.pixelwave.app` 도메인 매핑, 배포 완료. 10건 외부 curl 검증 통과 (host→site 분기 / direct prefix / privacy/terms/account-deletion / /invite UA / .html redirect / TLS).
 
 검증:
 - `next.pixelwave.app/` 가 host 기반으로 hub 콘텐츠를 보여준다 (또는 임시 host override 로 invest-note/today-alive 도 확인 가능).
@@ -261,18 +265,17 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 **목표**: 3개 운영 도메인을 Cloudflare Workers → Coolify 로 전환.
 
 작업:
-- [ ] Coolify 앱에 운영 도메인 3개 모두 추가, TLS 발급 확인.
-- [ ] Cloudflare DNS 레코드 변경 (Workers → Coolify IP/호스트).
-- [ ] CF 프록시(주황 구름) 유지 여부 결정.
-  - 유지 시 SSR 응답에 적절한 `Cache-Control` 부여.
-  - off 시 그레이 클라우드로 변경.
-- [ ] 기존 CF Worker 는 즉시 삭제하지 않고 **1주일 보존**. (롤백 안전망)
+- [x] Coolify 앱에 운영 도메인 (today-alive·invest-note·pixelwave.app·www.pixelwave.app) 추가, Traefik LE 발급 확인.
+- [x] Cloudflare DNS 레코드 변경: 각 도메인의 CF Workers/Pages Custom Domain 해제 후 A(또는 apex→www CNAME) 158.247.208.173, **Proxy OFF (gray cloud)**.
+- [x] CF 프록시는 **OFF 로 시작** 결정. 안정화 후 ON 검토 (Phase 4 이후).
+- [ ] 기존 CF Worker/Pages 는 즉시 삭제하지 않고 **1주일 보존** (rollback 안전망). Phase 5 정리에서 제거.
 
 검증:
-- 3개 운영 도메인 모두 정상 응답, TLS 유효.
-- `/invite` 동작 확인 (실 단말 또는 UA 위조 curl).
-- privacy/terms/account-deletion 등 외부에서 인입될 가능성 있는 모든 경로가 정상.
-- 404/500 로그 모니터링 24시간.
+- ✅ 3개 운영 도메인 + www 모두 HTTP/2 200(또는 301), TLS 유효.
+- ✅ today-alive `/invite` UA 분기 iOS→App Store / Android→Play Store / 빈 UA→Play Store.
+- ✅ privacy / terms / account-deletion / .html → 깨끗 URL 308 같은 host 보존.
+- ✅ apex+www → invest-note 301 path+query 보존, http→https 302 force.
+- ⏳ 404/500 로그 모니터링 24시간 (Task #19).
 
 산출물: 운영 도메인의 Next.js/Coolify 전환 완료.
 
@@ -328,10 +331,10 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 **목표**: 운영 자산 정리 및 후속 작업 큐 정의.
 
 작업:
-- [ ] 기존 CF Worker/Pages 프로젝트 삭제.
-- [ ] `sites/*/wrangler.jsonc`, `_worker.js`, `_redirects`, `.assetsignore` 등 CF 전용 파일 제거.
-- [ ] `README.md` 갱신 (CF 기반 설명 → Coolify/Next.js 기반).
-- [ ] 본 문서(`docs/migration-plan.md`)를 회고/사후 기록으로 마감하거나 `docs/architecture.md` 로 발전.
+- [ ] 기존 CF Worker/Pages 프로젝트 삭제. (콘솔 작업)
+- [x] `sites/*/wrangler.jsonc`, `_worker.js`, `_redirects`, `.assetsignore` 등 CF 전용 파일 + `sites/` `shared/` 디렉토리 + `docs/legacy-readme.md` 통째 제거.
+- [x] `README.md` 갱신 (CF 기반 설명 → Coolify/Next.js 기반).
+- [ ] 본 문서(`docs/migration-plan.md`)를 회고/사후 기록으로 마감하거나 `docs/architecture.md` 로 발전. (Phase 4 이후)
 
 검증:
 - 저장소 내 Cloudflare 관련 잔존 파일 없음.
@@ -350,7 +353,8 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 | 댓글 기능 | moderation 부담 큼. 도입 보류 | v1 이후 |
 | 다중 작성자 | NextAuth role 확장 필요 | 필요 시점 |
 | ISR/캐싱 정책 | SSR 응답 캐시 헤더 설계 | Phase 4 |
-| Postgres 튜닝/백업 활성 | §3.5 conf 적용 + R2 버킷 `pixelwave-backups` 생성 + 토큰 발급 + Coolify Postgres S3 백업 daily | **Phase 3 진입 전** (현재 미적용) |
+| Postgres 백업 활성 | R2 `pixelwave-backups` + Coolify 글로벌 S3 Storage `pixelwave-r2-backups` 연결 daily | ✅ 완료 |
+| Postgres 튜닝값 적용 | §3.5 postgresql.conf (max_connections=100 등) | 사용자 결정으로 보류, 필요시 요청 (Task #21) |
 | 백업 복구 리허설 | Postgres dump 복원 테스트 | Phase 3 직후 |
 | SEO 정본 URL 위반 | canonical 누락 시 중복 색인 | Phase 4 코드 리뷰 |
 
@@ -372,3 +376,9 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 - 2026-05-28: **Phase 1.5 완료.** proxy.ts 에 `pixelwave.app`/`www.pixelwave.app` → `https://invest-note.pixelwave.app{path}{search}` 301 추가 (Phase 3 진짜 hub 생기기 전까지 유지, 검증용 `next.pixelwave.app` 은 제외). 6가지 시나리오 curl 통과.
 - 2026-05-28: **Phase 1.6 완료.** Multi-stage Dockerfile (node:22-alpine, deps/builder/runner) + standalone 출력 사용. NODE_OPTIONS=--max-old-space-size=1024, non-root nextjs 유저, PORT=3000. `.dockerignore` 로 docs/sites/shared/memo.txt/README/.git 제외. 빌드: 76.5MB (compressed) / 306MB (uncompressed), arch=amd64 (Coolify 호스트 호환). 컨테이너 실행 후 host 위조 + UA 분기 + .html redirect 전부 dev 와 동일 동작 확인.
 - 2026-05-28: **Phase 1.7 작성 완료.** `.github/workflows/build.yml` — main/develop push 트리거, `environment: production` 의 REGISTRY_URL/USERNAME/PASSWORD secrets 사용, buildx 로 linux/amd64 빌드 후 `registry.pixelwave.app/pixelwave-web:<short-sha>` 와 `:<branch>` 태그로 push. gha cache(`type=gha,mode=max`). 실제 트리거는 GitHub 푸시 후 검증 필요(미push).
+- 2026-05-28: GHA push 실패 → 두 단계 fix. (1) provenance/sbom 끔 — buildx attestation manifest 가 registry:2 와 비호환. (2) `outputs: type=registry,oci-mediatypes=false` — docker schema2 단일 manifest 강제. (3) **결정적 fix**: registry 측 `REGISTRY_STORAGE_S3_CHUNKSIZE=104857600` (100MB) 추가. node 베이스 layer 가 default chunksize(10MB) 초과해 multipart upload 사용 시 R2 의 part listing 즉시 일관성 미보장으로 "s3aws: Path not found" 발생 → chunksize 키워 single-part 강제로 해결.
+- 2026-05-28: **Phase 1.8 완료. Phase 1 종료.** Coolify 의 `pixelwave-web` 프로젝트에 Docker Image 리소스로 `registry.pixelwave.app/pixelwave-web:develop` 등록, port 3000 노출, `next.pixelwave.app` 도메인 매핑, NODE_ENV/NEXT_TELEMETRY_DISABLED env 만 명시. Traefik LE 발급 통과, HTTP/2 200. 외부 curl 10건(host→site / 직접 prefix / privacy/terms/account-deletion / /invite UA iOS·Android / .html redirect) 전부 통과. 운영 도메인(pixelwave.app·invest-note·today-alive) host 매핑 검증은 Phase 2 cutover 후에만 가능.
+- 2026-05-28: **Phase 2 (DNS cutover) 통신 검증 통과.** today-alive → invest-note → hub(apex+www) 순서로 cutover. 각 도메인마다 (1) Coolify Domains 매핑 (2) CF Workers/Pages Custom Domain 해제 (3) CF DNS A/CNAME 으로 158.247.208.173·Proxy OFF (4) Traefik LE 발급 (5) 외부 curl 검증. today-alive 7건/invest-note 8건/hub 7건 통과. mailto subject 인코딩·canonical link·http→https force·301 path+query 보존 모두 확인. CF 잔재(Worker/Pages/cloudflare branches)는 1주일 후 Phase 5 에서 정리. 24시간 운영 모니터링 진행 중(Task #19).
+- 2026-05-28: **24h 운영 모니터링 skip 결정.** 외부 22건 curl 검증으로 통신 정합성 확인됨. Task #19 closed.
+- 2026-05-28: **Phase 5 정리 1차 진행.** `sites/`(hub/invest-note/today-alive 정적 + wrangler/_worker/_redirects/.assetsignore), `shared/`(base.css·footer.html), `docs/legacy-readme.md` git 에서 제거. `README.md` 를 Coolify/Next.js 운영 가이드로 새로 작성. `.gitignore` 의 legacy CF artifacts 라인 제거. scaffold 동봉 `public/*.svg` 5개 제거. CF Workers/Pages 콘솔에서 프로젝트 자체 삭제는 사용자 작업으로 남음.
+- 2026-05-28: **Postgres 백업 활성.** Coolify 의 글로벌 S3 Storages 에 `pixelwave-r2-backups` (R2 `pixelwave-backups` 버킷) 등록 후 `postgres-shared` Backups 탭이 이를 참조. credential 중앙 관리. 튜닝값은 사용자 결정으로 보류 → Task #21.
