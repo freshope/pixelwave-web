@@ -15,6 +15,7 @@ const SITE_BY_HOST: Record<string, Site> = {
 // next.pixelwave.app 은 검증용이라 redirect 대상에서 제외하고 placeholder 노출.
 const HUB_REDIRECT_HOSTS = new Set(["pixelwave.app", "www.pixelwave.app"]);
 const HUB_REDIRECT_TARGET_ORIGIN = "https://invest-note.pixelwave.app";
+const HUB_NONREDIRECT_PREFIXES = ["/admin", "/login"];
 
 function resolveSite(host: string): Site {
   const hostname = host.split(":")[0].toLowerCase();
@@ -27,8 +28,8 @@ export function proxy(req: NextRequest) {
 
   if (HUB_REDIRECT_HOSTS.has(hostname)) {
     const pathname = req.nextUrl.pathname;
-    // 어드민은 hub 의 정본 도메인에서 동작해야 하므로 redirect 가 가로채지 않게 hub 로 rewrite.
-    if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+    // 어드민/로그인 등은 hub 정본 도메인에서 동작해야 함 — redirect 가로채지 않고 hub 로 rewrite.
+    if (HUB_NONREDIRECT_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
       const url = req.nextUrl.clone();
       url.pathname = `/hub${pathname}`;
       return NextResponse.rewrite(url);
