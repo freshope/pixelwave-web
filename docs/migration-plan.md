@@ -182,6 +182,10 @@ REGISTRY_STORAGE_S3_REGION=auto
 REGISTRY_STORAGE_S3_BUCKET=pixelwave-registry
 REGISTRY_STORAGE_S3_REGIONENDPOINT=https://<account-id>.r2.cloudflarestorage.com
 REGISTRY_STORAGE_S3_FORCEPATHSTYLE=true
+# R2 의 S3 API 가 multipart upload 의 part listing 일관성을 즉시 보장하지 않아
+# registry:2 의 multipart upload 가 final PUT 단계에서 "Path not found" 로 실패한다.
+# 단일 PUT 한도(100MB) 안에서 모든 layer 가 들어가도록 chunksize 를 100MB 로 설정한다.
+REGISTRY_STORAGE_S3_CHUNKSIZE=104857600
 REGISTRY_AUTH=htpasswd
 REGISTRY_AUTH_HTPASSWD_REALM=Registry
 REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
@@ -372,3 +376,4 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 - 2026-05-28: **Phase 1.5 완료.** proxy.ts 에 `pixelwave.app`/`www.pixelwave.app` → `https://invest-note.pixelwave.app{path}{search}` 301 추가 (Phase 3 진짜 hub 생기기 전까지 유지, 검증용 `next.pixelwave.app` 은 제외). 6가지 시나리오 curl 통과.
 - 2026-05-28: **Phase 1.6 완료.** Multi-stage Dockerfile (node:22-alpine, deps/builder/runner) + standalone 출력 사용. NODE_OPTIONS=--max-old-space-size=1024, non-root nextjs 유저, PORT=3000. `.dockerignore` 로 docs/sites/shared/memo.txt/README/.git 제외. 빌드: 76.5MB (compressed) / 306MB (uncompressed), arch=amd64 (Coolify 호스트 호환). 컨테이너 실행 후 host 위조 + UA 분기 + .html redirect 전부 dev 와 동일 동작 확인.
 - 2026-05-28: **Phase 1.7 작성 완료.** `.github/workflows/build.yml` — main/develop push 트리거, `environment: production` 의 REGISTRY_URL/USERNAME/PASSWORD secrets 사용, buildx 로 linux/amd64 빌드 후 `registry.pixelwave.app/pixelwave-web:<short-sha>` 와 `:<branch>` 태그로 push. gha cache(`type=gha,mode=max`). 실제 트리거는 GitHub 푸시 후 검증 필요(미push).
+- 2026-05-28: GHA push 실패 → 두 단계 fix. (1) provenance/sbom 끔 — buildx attestation manifest 가 registry:2 와 비호환. (2) `outputs: type=registry,oci-mediatypes=false` — docker schema2 단일 manifest 강제. (3) **결정적 fix**: registry 측 `REGISTRY_STORAGE_S3_CHUNKSIZE=104857600` (100MB) 추가. node 베이스 layer 가 default chunksize(10MB) 초과해 multipart upload 사용 시 R2 의 part listing 즉시 일관성 미보장으로 "s3aws: Path not found" 발생 → chunksize 키워 single-part 강제로 해결.
