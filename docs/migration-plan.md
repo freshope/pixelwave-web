@@ -331,10 +331,10 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 **목표**: 운영 자산 정리 및 후속 작업 큐 정의.
 
 작업:
-- [ ] 기존 CF Worker/Pages 프로젝트 삭제.
-- [ ] `sites/*/wrangler.jsonc`, `_worker.js`, `_redirects`, `.assetsignore` 등 CF 전용 파일 제거.
-- [ ] `README.md` 갱신 (CF 기반 설명 → Coolify/Next.js 기반).
-- [ ] 본 문서(`docs/migration-plan.md`)를 회고/사후 기록으로 마감하거나 `docs/architecture.md` 로 발전.
+- [ ] 기존 CF Worker/Pages 프로젝트 삭제. (콘솔 작업)
+- [x] `sites/*/wrangler.jsonc`, `_worker.js`, `_redirects`, `.assetsignore` 등 CF 전용 파일 + `sites/` `shared/` 디렉토리 + `docs/legacy-readme.md` 통째 제거.
+- [x] `README.md` 갱신 (CF 기반 설명 → Coolify/Next.js 기반).
+- [ ] 본 문서(`docs/migration-plan.md`)를 회고/사후 기록으로 마감하거나 `docs/architecture.md` 로 발전. (Phase 4 이후)
 
 검증:
 - 저장소 내 Cloudflare 관련 잔존 파일 없음.
@@ -378,3 +378,5 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 - 2026-05-28: GHA push 실패 → 두 단계 fix. (1) provenance/sbom 끔 — buildx attestation manifest 가 registry:2 와 비호환. (2) `outputs: type=registry,oci-mediatypes=false` — docker schema2 단일 manifest 강제. (3) **결정적 fix**: registry 측 `REGISTRY_STORAGE_S3_CHUNKSIZE=104857600` (100MB) 추가. node 베이스 layer 가 default chunksize(10MB) 초과해 multipart upload 사용 시 R2 의 part listing 즉시 일관성 미보장으로 "s3aws: Path not found" 발생 → chunksize 키워 single-part 강제로 해결.
 - 2026-05-28: **Phase 1.8 완료. Phase 1 종료.** Coolify 의 `pixelwave-web` 프로젝트에 Docker Image 리소스로 `registry.pixelwave.app/pixelwave-web:develop` 등록, port 3000 노출, `next.pixelwave.app` 도메인 매핑, NODE_ENV/NEXT_TELEMETRY_DISABLED env 만 명시. Traefik LE 발급 통과, HTTP/2 200. 외부 curl 10건(host→site / 직접 prefix / privacy/terms/account-deletion / /invite UA iOS·Android / .html redirect) 전부 통과. 운영 도메인(pixelwave.app·invest-note·today-alive) host 매핑 검증은 Phase 2 cutover 후에만 가능.
 - 2026-05-28: **Phase 2 (DNS cutover) 통신 검증 통과.** today-alive → invest-note → hub(apex+www) 순서로 cutover. 각 도메인마다 (1) Coolify Domains 매핑 (2) CF Workers/Pages Custom Domain 해제 (3) CF DNS A/CNAME 으로 158.247.208.173·Proxy OFF (4) Traefik LE 발급 (5) 외부 curl 검증. today-alive 7건/invest-note 8건/hub 7건 통과. mailto subject 인코딩·canonical link·http→https force·301 path+query 보존 모두 확인. CF 잔재(Worker/Pages/cloudflare branches)는 1주일 후 Phase 5 에서 정리. 24시간 운영 모니터링 진행 중(Task #19).
+- 2026-05-28: **24h 운영 모니터링 skip 결정.** 외부 22건 curl 검증으로 통신 정합성 확인됨. Task #19 closed.
+- 2026-05-28: **Phase 5 정리 1차 진행.** `sites/`(hub/invest-note/today-alive 정적 + wrangler/_worker/_redirects/.assetsignore), `shared/`(base.css·footer.html), `docs/legacy-readme.md` git 에서 제거. `README.md` 를 Coolify/Next.js 운영 가이드로 새로 작성. `.gitignore` 의 legacy CF artifacts 라인 제거. CF Workers/Pages 콘솔에서 프로젝트 자체 삭제는 사용자 작업으로 남음.
