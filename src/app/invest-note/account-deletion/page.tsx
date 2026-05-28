@@ -1,0 +1,131 @@
+import type { Metadata } from "next";
+import { Footer } from "@/components/Footer";
+
+const URL = "https://invest-note.pixelwave.app/account-deletion";
+const SUPPORT_MAILTO =
+  "mailto:support@pixelwave.app?subject=%5B%ED%88%AC%EC%9E%90%EB%85%B8%ED%8A%B8%5D%20%EA%B3%84%EC%A0%95%20%EC%82%AD%EC%A0%9C%20%EC%9A%94%EC%B2%AD";
+
+export const metadata: Metadata = {
+  title: "계정 및 데이터 삭제 안내 — 투자노트",
+  alternates: { canonical: URL },
+};
+
+export default function InvestNoteAccountDeletionPage() {
+  return (
+    <div className="wrap">
+      <h1>계정 및 데이터 삭제 안내</h1>
+      <p className="updated">시행일: 2026년 5월 20일</p>
+
+      <p>
+        <strong>앱 이름</strong>: 투자노트
+        <br />
+        <strong>개발자</strong>: 이진우 (Pixelwave) &nbsp;|&nbsp;{" "}
+        <a href="mailto:support@pixelwave.app">support@pixelwave.app</a>
+      </p>
+
+      <p>
+        투자노트는 이용자가 직접 계정과 관련 데이터를 삭제할 수 있도록 앱 내
+        기능과 웹 요청 두 가지 방법을 제공합니다.
+      </p>
+
+      <hr />
+
+      <h2>1. 앱 내에서 직접 삭제</h2>
+      <ol>
+        <li>투자노트 앱을 실행하고 로그인합니다.</li>
+        <li>
+          하단 탭에서 <strong>“설정”</strong>을 엽니다.
+        </li>
+        <li>
+          <strong>“계정”</strong> 섹션의 <strong>“회원 탈퇴”</strong>를 누릅니다.
+        </li>
+        <li>
+          경고 안내를 확인하고 <strong>“탈퇴”</strong>를 눌러 확정합니다.
+        </li>
+      </ol>
+      <p>
+        확정 즉시 서버에서 계정과 관련 데이터가 영구 삭제되며, 앱은 로그인
+        화면으로 이동합니다.
+      </p>
+
+      <h2>2. 앱 없이 웹으로 요청 (앱 미설치자용)</h2>
+      <p>
+        더 이상 앱을 사용하지 않거나 앱을 설치할 수 없는 경우, 아래 이메일로
+        계정 삭제를 요청할 수 있습니다.
+      </p>
+      <p>
+        요청 주소: <a href={SUPPORT_MAILTO}>support@pixelwave.app</a>
+      </p>
+      <p>이메일 본문에 다음을 포함해 주세요.</p>
+      <ul>
+        <li>가입에 사용한 이메일 주소</li>
+        <li>가입에 사용한 로그인 방식 (Google / Apple / Kakao)</li>
+        <li>요청 사유 (선택)</li>
+      </ul>
+      <p>
+        본인 확인 후 영업일 기준 <strong>7일 이내</strong>에 삭제를 완료하고
+        회신해 드립니다.
+      </p>
+
+      <hr />
+
+      <h2>3. 삭제되는 데이터</h2>
+      <p>탈퇴 또는 삭제 요청 시 다음 데이터가 모두 영구 삭제됩니다.</p>
+      <ul>
+        <li>계정 정보 (이메일 주소, 소셜 로그인 식별자)</li>
+        <li>이용자가 등록한 증권 계좌 정보</li>
+        <li>거래 기록 (매수·매도 내역, 가격, 수량, 일자)</li>
+        <li>매매 메모 및 복기 내용</li>
+        <li>이용자가 업로드한 거래내역 파일</li>
+      </ul>
+
+      <h2>4. 일정 기간 보관되는 데이터</h2>
+      <p>
+        서비스 운영의 안전을 위해 다음 항목은 개인 식별이 불가능한 형태로
+        한시적으로 보관될 수 있습니다.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>항목</th>
+            <th>보관 기간</th>
+            <th>보관 사유</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>서버 접근 로그 (IP, 요청 시각, 응답 코드)</td>
+            <td>최대 30일</td>
+            <td>장애 대응 및 보안 사고 추적</td>
+          </tr>
+          <tr>
+            <td>관련 법령에 따른 보관 의무 데이터</td>
+            <td>해당 법령이 정한 기간</td>
+            <td>전자상거래법 등 법령 준수</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        위 보관 데이터는 보관 기간이 지나면 자동으로 파기되며, 이용자를 다시
+        식별할 수 있는 형태로 결합되지 않습니다.
+      </p>
+
+      <hr />
+
+      <p>
+        관련 정책은 <a href="/privacy">개인정보처리방침</a> 및{" "}
+        <a href="/terms">서비스 이용약관</a> 에서 함께 확인하실 수 있습니다.
+      </p>
+
+      <Footer
+        siteName="pixelwave"
+        links={[
+          { href: "/", label: "홈" },
+          { href: "/privacy", label: "개인정보처리방침" },
+          { href: "/terms", label: "서비스 이용약관" },
+        ]}
+        supportEmail="support@pixelwave.app"
+      />
+    </div>
+  );
+}

@@ -1,0 +1,15 @@
+.git
+.next
+node_modules
+docs
+sites
+shared
+memo.txt
+*.log
+.DS_Store
+.env*
+.vscode
+.idea
+README.md
+AGENTS.md
+CLAUDE.md
