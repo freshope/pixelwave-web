@@ -127,7 +127,7 @@ users        (id, github_id, role)                  -- v1 은 admin 1명
 - **공유 Postgres 인스턴스 1개**: 컨테이너 이름 `postgres-shared`, 향후 다른 프로젝트도 같은 인스턴스에 별도 DB/유저로 들어온다.
   - 이 마이그레이션용 DB/유저: `pixelwave` / `pixelwave`.
   - 인스턴스는 **외부 노출 OFF**, Coolify 내부 네트워크 한정.
-  - 백업: **Cloudflare R2 (S3 호환) 로 daily 자동 백업**. 별도 버킷 `pixelwave-backups`, registry 토큰과 분리된 별도 R2 토큰(`pixelwave-backups-rw`, write 권한만 부여). 백업은 인스턴스 단위(한 dump 안에 모든 DB).
+  - 백업: **Cloudflare R2 daily 자동 백업**. 별도 버킷 `pixelwave-backups`, registry 토큰과 분리된 별도 R2 토큰(`pixelwave-backups-rw`). credential 은 **Coolify 의 글로벌 S3 Storages** 에 `pixelwave-r2-backups` 로 등록해 두고, Postgres 리소스의 Backups 탭이 이걸 참조한다 — postgres-shared env 에 R2 키가 노출되지 않는다. 백업은 인스턴스 단위.
 - `postgresql.conf` 기준값 (공유 인스턴스 고려해 `max_connections` 상향):
   ```
   shared_buffers = 256MB
@@ -353,7 +353,8 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 | 댓글 기능 | moderation 부담 큼. 도입 보류 | v1 이후 |
 | 다중 작성자 | NextAuth role 확장 필요 | 필요 시점 |
 | ISR/캐싱 정책 | SSR 응답 캐시 헤더 설계 | Phase 4 |
-| Postgres 튜닝/백업 활성 | §3.5 conf 적용 + R2 버킷 `pixelwave-backups` 생성 + 토큰 발급 + Coolify Postgres S3 백업 daily | **Phase 3 진입 전** (현재 미적용) |
+| Postgres 백업 활성 | R2 `pixelwave-backups` + Coolify 글로벌 S3 Storage `pixelwave-r2-backups` 연결 daily | ✅ 완료 |
+| Postgres 튜닝값 적용 | §3.5 postgresql.conf (max_connections=100 등) | 사용자 결정으로 보류, 필요시 요청 (Task #21) |
 | 백업 복구 리허설 | Postgres dump 복원 테스트 | Phase 3 직후 |
 | SEO 정본 URL 위반 | canonical 누락 시 중복 색인 | Phase 4 코드 리뷰 |
 
@@ -379,4 +380,5 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 - 2026-05-28: **Phase 1.8 완료. Phase 1 종료.** Coolify 의 `pixelwave-web` 프로젝트에 Docker Image 리소스로 `registry.pixelwave.app/pixelwave-web:develop` 등록, port 3000 노출, `next.pixelwave.app` 도메인 매핑, NODE_ENV/NEXT_TELEMETRY_DISABLED env 만 명시. Traefik LE 발급 통과, HTTP/2 200. 외부 curl 10건(host→site / 직접 prefix / privacy/terms/account-deletion / /invite UA iOS·Android / .html redirect) 전부 통과. 운영 도메인(pixelwave.app·invest-note·today-alive) host 매핑 검증은 Phase 2 cutover 후에만 가능.
 - 2026-05-28: **Phase 2 (DNS cutover) 통신 검증 통과.** today-alive → invest-note → hub(apex+www) 순서로 cutover. 각 도메인마다 (1) Coolify Domains 매핑 (2) CF Workers/Pages Custom Domain 해제 (3) CF DNS A/CNAME 으로 158.247.208.173·Proxy OFF (4) Traefik LE 발급 (5) 외부 curl 검증. today-alive 7건/invest-note 8건/hub 7건 통과. mailto subject 인코딩·canonical link·http→https force·301 path+query 보존 모두 확인. CF 잔재(Worker/Pages/cloudflare branches)는 1주일 후 Phase 5 에서 정리. 24시간 운영 모니터링 진행 중(Task #19).
 - 2026-05-28: **24h 운영 모니터링 skip 결정.** 외부 22건 curl 검증으로 통신 정합성 확인됨. Task #19 closed.
-- 2026-05-28: **Phase 5 정리 1차 진행.** `sites/`(hub/invest-note/today-alive 정적 + wrangler/_worker/_redirects/.assetsignore), `shared/`(base.css·footer.html), `docs/legacy-readme.md` git 에서 제거. `README.md` 를 Coolify/Next.js 운영 가이드로 새로 작성. `.gitignore` 의 legacy CF artifacts 라인 제거. CF Workers/Pages 콘솔에서 프로젝트 자체 삭제는 사용자 작업으로 남음.
+- 2026-05-28: **Phase 5 정리 1차 진행.** `sites/`(hub/invest-note/today-alive 정적 + wrangler/_worker/_redirects/.assetsignore), `shared/`(base.css·footer.html), `docs/legacy-readme.md` git 에서 제거. `README.md` 를 Coolify/Next.js 운영 가이드로 새로 작성. `.gitignore` 의 legacy CF artifacts 라인 제거. scaffold 동봉 `public/*.svg` 5개 제거. CF Workers/Pages 콘솔에서 프로젝트 자체 삭제는 사용자 작업으로 남음.
+- 2026-05-28: **Postgres 백업 활성.** Coolify 의 글로벌 S3 Storages 에 `pixelwave-r2-backups` (R2 `pixelwave-backups` 버킷) 등록 후 `postgres-shared` Backups 탭이 이를 참조. credential 중앙 관리. 튜닝값은 사용자 결정으로 보류 → Task #21.
