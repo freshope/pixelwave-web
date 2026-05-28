@@ -1,16 +1,12 @@
+type FooterLink = { href: string; label: string };
+
 type FooterProps = {
   siteName: string;
-  privacyHref: string;
-  termsHref: string;
+  links: FooterLink[];
   supportEmail: string;
 };
 
-export function Footer({
-  siteName,
-  privacyHref,
-  termsHref,
-  supportEmail,
-}: FooterProps) {
+export function Footer({ siteName, links, supportEmail }: FooterProps) {
   const year = new Date().getFullYear();
   return (
     <footer className="site-footer">
@@ -18,8 +14,11 @@ export function Footer({
         © {year} {siteName}. All rights reserved.
       </div>
       <nav>
-        <a href={privacyHref}>개인정보처리방침</a>
-        <a href={termsHref}>서비스 이용약관</a>
+        {links.map((l) => (
+          <a key={l.href} href={l.href}>
+            {l.label}
+          </a>
+        ))}
         <a href={`mailto:${supportEmail}`}>문의</a>
       </nav>
     </footer>
