@@ -39,6 +39,8 @@ jobs:
           if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
             echo "latest=true" >> "$GITHUB_OUTPUT"
           fi
+          # /api/version 으로 노출할 빌드 시각 (UTC)
+          echo "build_time=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
 
       - name: Build and push image
         uses: docker/build-push-action@v6
@@ -46,6 +48,11 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64
+          # /api/version 으로 노출할 빌드 식별자를 이미지에 굽는다
+          build-args: |
+            APP_VERSION=${{ steps.meta.outputs.ref }}
+            GIT_SHA=${{ steps.meta.outputs.sha }}
+            BUILD_TIME=${{ steps.meta.outputs.build_time }}
           # registry:2 가 buildx 의 OCI attestation/index manifest 를 거부해 "unknown: unknown error" 가 난다.
           # provenance/sbom 끄고 + oci-mediatypes=false 로 docker schema2 단일 image manifest 만 push.
           provenance: false
