@@ -332,32 +332,34 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 **목표**: 운영 자산 정리 및 후속 작업 큐 정의.
 
 작업:
-- [ ] 기존 CF Worker/Pages 프로젝트 삭제. (콘솔 작업)
+- [ ] 기존 CF Worker/Pages 프로젝트 삭제 (콘솔, 사용자 작업). 운영 인입은 이미 Coolify 로 전환됨.
 - [x] `sites/*/wrangler.jsonc`, `_worker.js`, `_redirects`, `.assetsignore` 등 CF 전용 파일 + `sites/` `shared/` 디렉토리 + `docs/legacy-readme.md` 통째 제거.
-- [x] `README.md` 갱신 (CF 기반 설명 → Coolify/Next.js 기반).
-- [ ] 본 문서(`docs/migration-plan.md`)를 회고/사후 기록으로 마감하거나 `docs/architecture.md` 로 발전. (Phase 4 이후)
+- [x] `README.md` 갱신 (CF 기반 설명 → Coolify/Next.js 기반 + 로컬 dev 가이드).
+- [x] 본 문서(`docs/migration-plan.md`)를 회고/사후 기록으로 마감 (§7 추가). 별도 architecture.md 분리는 안 함 — README 의 "운영 인프라" 섹션 + 본 문서로 충분.
 
 검증:
-- 저장소 내 Cloudflare 관련 잔존 파일 없음.
-- 새 기여자가 README 만 보고 로컬 실행과 배포 흐름을 이해 가능.
+- ✅ 저장소 내 Cloudflare 관련 잔존 파일 없음.
+- ✅ 새 기여자가 README 만 보고 로컬 실행과 배포 흐름을 이해 가능.
 
-산출물: 정리된 저장소.
+산출물: 정리된 저장소 + 마감된 회고 문서.
 
 ---
 
 ## 5. 리스크 & 결정 보류 항목
 
-| 항목 | 내용 | 결정 시점 |
+| 항목 | 내용 | 상태 |
 |---|---|---|
-| CF 프록시 유지 여부 | 캐싱·DDoS 보호 vs 단순성 | Phase 2 cutover 시 |
-| 이미지 업로드 외부화 | 트래픽/용량 임계 도달 시 R2/S3 | v1 이후 |
-| 댓글 기능 | moderation 부담 큼. 도입 보류 | v1 이후 |
-| 다중 작성자 | NextAuth role 확장 필요 | 필요 시점 |
-| ISR/캐싱 정책 | SSR 응답 캐시 헤더 설계 | Phase 4 |
+| CF 프록시 유지 여부 | 캐싱·DDoS 보호 vs 단순성 | ✅ Phase 2 cutover 시 OFF(gray cloud) 결정 |
+| 이미지 업로드 외부화 | 트래픽/용량 임계 도달 시 R2/S3 | 보류 (v1 이후) |
+| 댓글 기능 | moderation 부담 큼 | 보류 (v1 이후) |
+| 다중 작성자 | NextAuth role 확장 필요 | 보류 (필요 시점) |
+| ISR/캐싱 정책 | SSR 응답 캐시 헤더 설계 | ✅ Phase 4 의 /b 라우트에 `revalidate=60` 적용 |
 | Postgres 백업 활성 | R2 `pixelwave-backups` + Coolify 글로벌 S3 Storage `pixelwave-r2-backups` 연결 daily | ✅ 완료 |
-| Postgres 튜닝값 적용 | §3.5 postgresql.conf (max_connections=100 등) | 사용자 결정으로 보류, 필요시 요청 (Task #21) |
-| 백업 복구 리허설 | Postgres dump 복원 테스트 | Phase 3 직후 |
-| SEO 정본 URL 위반 | canonical 누락 시 중복 색인 | Phase 4 코드 리뷰 |
+| Postgres 튜닝값 적용 | §3.5 postgresql.conf (max_connections=100 등) | 보류 — 사용자 결정 (Task #21, 필요시) |
+| 백업 복구 리허설 | Postgres dump 복원 테스트 | 보류 — Phase 3 직후 였으나 미실행, 필요시 진행 |
+| SEO 정본 URL 위반 | canonical 누락 시 중복 색인 | ✅ Phase 4 의 모든 /b 페이지가 `alternates.canonical = hub URL` 출력 |
+| Coolify image pull 캐시 | `:main` mutable tag 가 갱신 후 cached 그대로 사용 | 운영: 매 release 마다 immutable sha 태그로 박는 흐름. 향후 webhook 자동화 검토 |
+| hub 랜딩 교체 (Phase 4.5) | invest-note 301 → "최근 글" 인덱스 | 보류 — 사용자 결정으로 redirect 유지 |
 
 ---
 
@@ -394,3 +396,66 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 - 2026-05-29: **Phase 4.2 완료.** admin 글 CRUD 4 파일 + actions.ts. src/lib/markdown.ts 에 unified(remark-parse → remark-rehype → rehype-sanitize → rehype-stringify) 파이프라인. `<script>alert(1)</script>` 가 단순 텍스트로 무력화 sanity 확인. publishedAt 토글로 공개/비공개.
 - 2026-05-29: **Phase 4.3 완료.** hub 의 공개 라우트 src/app/hub/b/[board]/page.tsx (목록 — publishedAt 비null 만, desc 정렬) + [board]/[post]/page.tsx (상세 — mdToSafeHtml + dangerouslySetInnerHTML 안전). canonical = hub URL. revalidate=60. dev curl: 없는 board/post 모두 404, 회귀 invest-note 200.
 - 2026-05-29: **Phase 4.4 완료. Phase 4 코드 종료.** src/lib/board-post.ts 의 site-aware loader 가 board_sites 와 inner join 으로 화이트리스트 동시 검사. invest-note·today-alive 각각 b/[board]/page.tsx + [post]/page.tsx (4 파일). canonical 메타는 모든 site 에서 동일하게 hub URL 출력. dev: 없는 board/post 모두 404, 회귀(랜딩·/invite) 통과. 실제 노출 검증(brower, 보드 2개·exposure sites 분리 설정)은 사용자 manual.
+- 2026-05-29: **Phase 5 마감.** 본 문서를 회고 형태로 종료(§7 추가), §5 보류 항목 상태 갱신, §4 Phase 5 체크박스 정리. CF Workers/Pages 콘솔 프로젝트 자체 삭제만 사용자 외부 작업으로 남음. 운영 자료는 README + 본 문서로 충분 — 별도 architecture.md 미작성.
+
+---
+
+## 7. 마이그레이션 종료 회고
+
+**완료일**: 2026-05-29
+
+### 인입 흐름 (운영)
+
+```
+사용자 브라우저
+   ↓ HTTPS (CF DNS, Proxy OFF, A/CNAME → 158.247.208.173)
+Coolify Traefik (LE 자동 발급, 4 도메인 매핑)
+   ↓
+pixelwave-web (Next.js standalone 컨테이너)
+   ↓ src/proxy.ts host → site prefix rewrite
+[hub] / [invest-note] / [today-alive] route group
+   ↓ DB 접근만 server component / server action
+postgres-shared (공유 Postgres, 외부 노출 OFF)
+   ↓ daily dump
+Coolify 글로벌 S3 Storage `pixelwave-r2-backups`
+   ↓
+Cloudflare R2 `pixelwave-backups`
+```
+
+### 빌드/배포 흐름
+
+```
+git push main
+   ↓
+GitHub Actions (.github/workflows/build.yml — provenance:false, oci-mediatypes:false)
+   ↓
+registry.pixelwave.app/pixelwave-web:<short-sha> + :main
+   ↑ Cloudflare R2 `pixelwave-registry` (REGISTRY_STORAGE_S3_CHUNKSIZE=104857600 으로 multipart 회피)
+   ↓
+Coolify (Image Tag = sha 명시) → docker pull → 컨테이너 재기동
+```
+
+### 운영 도메인
+
+| 호스트 | 동작 |
+|---|---|
+| `pixelwave.app`, `www.pixelwave.app` | hub redirect → invest-note 301 (정본 path 만 `/admin`·`/login`·`/b` 예외 → hub site rewrite) |
+| `invest-note.pixelwave.app` | 정적 랜딩 + privacy/terms/account-deletion + `/b/...`(화이트리스트) |
+| `today-alive.pixelwave.app` | 정적 랜딩 + privacy/terms + `/invite` UA 분기 + `/b/...`(화이트리스트) |
+
+### 회고 요약 — 함정 모음
+
+1. **Next.js 16 의 `middleware` → `proxy` rename**: deprecation 경고 후 file/named export 둘 다 정정. AGENTS.md 의 사전 경고가 적중.
+2. **registry:2 + R2 multipart 비호환**: 큰 layer 가 multipart upload 로 분할되면 R2 의 part listing 일관성 미보장으로 "s3aws: Path not found". `CHUNKSIZE=104857600` 으로 single-part 강제 회피.
+3. **buildx attestation manifest 비호환**: provenance/sbom + OCI mediatypes 모두 끔.
+4. **Coolify image pull 캐시**: `:main` 갱신 후에도 cached 그대로 사용. immutable sha 태그로 박아 우회.
+5. **Universal SSL 의 2단계 도메인 미커버**: `api.invest-note.pixelwave.app` 의 인증서 사라짐. ACM 또는 origin 자체 TLS 로 해결 (마이그레이션 범위 외, 사용자 처리).
+6. **hub redirect 가 server action callback 까지 가로채는 위험**: HUB_NONREDIRECT_PREFIXES(`/admin`/`/login`/`/b`) 로 정본 path 만 우회.
+
+### 미완료/후속
+
+- CF Workers/Pages 프로젝트 자체 삭제 (사용자 콘솔 작업)
+- Postgres 튜닝값 적용 (Task #21, 필요시)
+- 백업 복구 리허설 (필요시)
+- hub 랜딩 교체 (Phase 4.5, 미진행 결정)
+- 이미지 업로드 외부화, 댓글, 다중 작성자 (v1 이후)
