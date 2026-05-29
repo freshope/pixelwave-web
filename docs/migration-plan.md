@@ -286,16 +286,17 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 **목표**: 게시판 UI 를 짓기 전에 DB 연결과 어드민 인증을 먼저 굳힌다.
 
 작업:
-- [ ] Drizzle (또는 선택한 ORM) 도입, Postgres 연결.
-- [ ] 스키마 작성: `sites`, `boards`, `board_sites`, `posts`, `users`.
-- [ ] 초기 마이그레이션 실행, `sites` 시드 (`hub`, `invest-note`, `today-alive`).
-- [ ] NextAuth 설정, GitHub Provider, 관리자 화이트리스트.
-- [ ] `app/(hub)/admin/page.tsx` — 로그인 확인용 최소 페이지.
+- [x] Drizzle ORM 도입, Postgres 연결 (lazy `getDb()` 패턴, src/db/index.ts).
+- [x] 스키마 작성: `sites`, `boards`, `board_sites`, `posts`, `users` (src/db/schema.ts).
+- [x] 초기 마이그레이션 실행 (src/db/migrations/0000_*.sql), `sites` 시드 (`hub`, `invest-note`, `today-alive`).
+- [x] NextAuth v5 설정 (src/auth.ts), GitHub Provider, 관리자 ADMIN_GITHUB_IDS 화이트리스트.
+- [x] `src/app/hub/admin/page.tsx` + `layout.tsx` (인증 가드) + `src/app/hub/login/page.tsx`. proxy.ts 의 hub redirect 가 /admin · /login 은 hub site 로 rewrite (HUB_NONREDIRECT_PREFIXES).
 
 검증:
-- 관리자 GitHub 로그인 → `/admin` 진입 가능.
-- 비관리자 또는 비로그인 → `/admin` 404.
-- DB 마이그레이션 idempotent (재실행 시 깨지지 않음).
+- ✅ 관리자(`github_id=5800336`) GitHub 로그인 → `/admin` 진입 운영(`https://pixelwave.app/admin`) 확인.
+- ✅ 비로그인 → `/admin` → `/login` 307 redirect (docs 의 "404" 기준에서 redirect 로 변경 — UX 측면).
+- ✅ DB 마이그레이션 idempotent (drizzle-kit migrate 의 journal 기반).
+- ✅ NextAuth providers callback URL = `https://pixelwave.app/api/auth/callback/github`.
 
 산출물: 인증된 어드민 라우트, 마이그레이션된 DB.
 
@@ -387,3 +388,4 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 - 2026-05-28: **staging 사용 안 함 결정.** `next.pixelwave.app` 도메인 폐기. `proxy.ts` 의 SITE_BY_HOST 에서 매핑 제거. 후속 사용자 작업: Coolify pixelwave-web 앱 Domains 에서 next.pixelwave.app 제거 / CF DNS 의 `next` 레코드 제거 / GitHub OAuth App callback URL 을 운영 도메인으로 변경 (Phase 3 NextAuth 셋업 시 처리). develop staging 없이 로컬 dev → main 머지 → 운영 배포 흐름으로 운영.
 - 2026-05-29: **Phase 3.1~3.4 코드 완료** (Drizzle ORM + 스키마 5종 + 첫 마이그레이션 + sites 시드 + NextAuth v5 + GitHub provider + ADMIN_GITHUB_IDS 화이트리스트 + admin/login 페이지 + 인증 가드 + proxy 의 hub redirect 예외 /admin·/login).
 - 2026-05-29: **로컬 dev 환경 검증 통과.** docker postgres:17-alpine → pnpm db:migrate(5 테이블) → pnpm db:seed(sites 3행) → pnpm dev → /login 200 / /admin → /login 307 / NextAuth providers·csrf 200 / 정적 페이지 회귀 없음. 브라우저 GitHub OAuth(dev App) 통과 + admin 진입 확인. dotenv 로 drizzle-kit·seed 가 .env.local 자동 로드.
+- 2026-05-29: **Phase 3.5 운영 셋업 완료. Phase 3 종료.** release/v0.1.4 머지(main HEAD `beabc9e`). 운영 OAuth App callback 을 `https://pixelwave.app/api/auth/callback/github` 로 변경. Coolify env vars 7개(DATABASE_URL/AUTH_SECRET/AUTH_URL/AUTH_TRUST_HOST/GITHUB_CLIENT_*/ADMIN_GITHUB_IDS) 추가 + Redeploy. postgres-shared Terminal 에서 0000_*.sql 적용 + sites 시드. 외부 curl 6건 통과(/login 200·/admin 307·csrf 200·providers callback URL 정확·apex 301·www /login 200). 브라우저 운영 GitHub OAuth flow 통과 + admin 진입 확인. ⚠️ Coolify image pull 캐시 이슈 — `:main` mutable tag 가 갱신 후 cached 그대로 사용. **immutable sha 태그(`beabc9e`)** 로 박아 우회.
