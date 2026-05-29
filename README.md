@@ -52,7 +52,7 @@ registry.pixelwave.app/pixelwave-web:<short-sha>  +  :<branch>
 Coolify (pixelwave-web 프로젝트) → Traefik LE → 4개 도메인
 ```
 
-자세한 인프라·결정 사항은 [`docs/migration-plan.md`](docs/migration-plan.md) 참고.
+현재 사양은 [`docs/spec-current.md`](docs/spec-current.md), 결정 기록은 [`docs/decisions.md`](docs/decisions.md), 향후 계획은 [`docs/roadmap.md`](docs/roadmap.md), 보류 작업은 [`docs/backlog.md`](docs/backlog.md).
 
 ## 디렉토리 구조
 
