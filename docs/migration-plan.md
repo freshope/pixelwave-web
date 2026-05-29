@@ -385,3 +385,5 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 - 2026-05-28: **CF DNS 운영 도메인 A → CNAME 전환 완료** (apex `pixelwave.app` 만 A `158.247.208.173` 유지, 서브도메인은 CNAME → apex). 호스트 IP 변경 시 단일 갱신점.
 - 2026-05-28: **`api.invest-note.pixelwave.app` TLS 미커버 해소** (사용자 측 처리). 마이그레이션 범위 외 백엔드 도메인.
 - 2026-05-28: **staging 사용 안 함 결정.** `next.pixelwave.app` 도메인 폐기. `proxy.ts` 의 SITE_BY_HOST 에서 매핑 제거. 후속 사용자 작업: Coolify pixelwave-web 앱 Domains 에서 next.pixelwave.app 제거 / CF DNS 의 `next` 레코드 제거 / GitHub OAuth App callback URL 을 운영 도메인으로 변경 (Phase 3 NextAuth 셋업 시 처리). develop staging 없이 로컬 dev → main 머지 → 운영 배포 흐름으로 운영.
+- 2026-05-29: **Phase 3.1~3.4 코드 완료** (Drizzle ORM + 스키마 5종 + 첫 마이그레이션 + sites 시드 + NextAuth v5 + GitHub provider + ADMIN_GITHUB_IDS 화이트리스트 + admin/login 페이지 + 인증 가드 + proxy 의 hub redirect 예외 /admin·/login).
+- 2026-05-29: **로컬 dev 환경 검증 통과.** docker postgres:17-alpine → pnpm db:migrate(5 테이블) → pnpm db:seed(sites 3행) → pnpm dev → /login 200 / /admin → /login 307 / NextAuth providers·csrf 200 / 정적 페이지 회귀 없음. 브라우저 GitHub OAuth(dev App) 통과 + admin 진입 확인. dotenv 로 drizzle-kit·seed 가 .env.local 자동 로드.
