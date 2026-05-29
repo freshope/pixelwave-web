@@ -86,3 +86,8 @@
 - **결정**: `docs/migration-plan.md` 제거 후 `roadmap.md` / `backlog.md` / `decisions.md` / `spec-current.md` 4개로 분리.
 - **이유**: 마이그레이션은 종료. history 문서가 운영 reference 와 섞이면 가독성 떨어짐.
 - **영향**: README 의 docs 링크 갱신.
+
+## D-18. git 태그(`v*`) 기반 이미지 버전 추적 — 2026-05-29
+- **결정**: build.yml 트리거에 `tags: ['v*']` 추가. 이미지 태그를 ref 종류별로 — 브랜치 push → `:<short-sha>` + `:main|:develop`, `v*` 태그 push → `:<short-sha>` + `:v1.2.3` + `:latest`.
+- **이유**: short-sha 만으로는 R2 registry 의 `_manifests/tags/` 에서 "내가 푸시한 버전" 을 찾기 어려움 (날짜·브랜치·순서 정보 없음). git 태그명이 곧 이미지 태그가 되어 `_manifests/tags/v1.2.3/` 로 즉시 식별 가능. [[D-16]] 의 immutable short-sha pull 정책과 병행.
+- **영향**: 릴리즈 시 `git tag v1.2.3 && git push origin v1.2.3`. `meta.branch` output → `meta.ref` 로 정정(태그 push 때 의미 일치). `:latest` 는 v* 태그에서만 갱신되는 mutable 핸들. `environment: production` 이 태그 push 에도 적용되므로 승인 규칙 존재 시 태그 빌드도 대기.

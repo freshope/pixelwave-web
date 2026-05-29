@@ -3,6 +3,7 @@ name: build-and-push
 on:
   push:
     branches: [main, develop]
+    tags: ['v*']
   workflow_dispatch:
 
 concurrency:
@@ -32,7 +33,12 @@ jobs:
         id: meta
         run: |
           echo "sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
-          echo "branch=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          # ref = 브랜치 push 면 브랜치명(main/develop), 태그 push 면 태그명(v1.2.3)
+          echo "ref=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          # v* 태그 push 일 때만 :latest 도 갱신 (항상 최신 릴리즈를 가리키는 mutable 핸들)
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            echo "latest=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Build and push image
         uses: docker/build-push-action@v6
@@ -45,8 +51,10 @@ jobs:
           provenance: false
           sbom: false
           outputs: type=registry,oci-mediatypes=false
+          # build-push-action 은 빈 줄을 무시하므로 latest 가 아닐 때 3번째 줄은 자동 생략됨
           tags: |
             ${{ secrets.REGISTRY_URL }}/pixelwave-web:${{ steps.meta.outputs.sha }}
-            ${{ secrets.REGISTRY_URL }}/pixelwave-web:${{ steps.meta.outputs.branch }}
+            ${{ secrets.REGISTRY_URL }}/pixelwave-web:${{ steps.meta.outputs.ref }}
+            ${{ steps.meta.outputs.latest == 'true' && format('{0}/pixelwave-web:latest', secrets.REGISTRY_URL) || '' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
