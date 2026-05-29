@@ -15,7 +15,7 @@ const SITE_BY_HOST: Record<string, Site> = {
 // next.pixelwave.app 은 검증용이라 redirect 대상에서 제외하고 placeholder 노출.
 const HUB_REDIRECT_HOSTS = new Set(["pixelwave.app", "www.pixelwave.app"]);
 const HUB_REDIRECT_TARGET_ORIGIN = "https://invest-note.pixelwave.app";
-const HUB_NONREDIRECT_PREFIXES = ["/admin", "/login"];
+const HUB_NONREDIRECT_PREFIXES = ["/admin", "/login", "/b"];
 
 function resolveSite(host: string): Site {
   const hostname = host.split(":")[0].toLowerCase();

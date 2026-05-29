@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { auth, signOut } from "@/auth";
 
 export const metadata = {
@@ -13,6 +14,11 @@ export default async function AdminPage() {
         로그인: {session?.user?.name ?? "(unknown)"} (github id{" "}
         {session?.user?.githubId ?? "-"})
       </p>
+      <ul>
+        <li>
+          <Link href="/admin/boards">보드 관리</Link>
+        </li>
+      </ul>
       <form
         action={async () => {
           "use server";
