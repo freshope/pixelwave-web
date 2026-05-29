@@ -31,7 +31,8 @@ export default async function BoardEditPage({ params }: Props) {
     <main className="wrap">
       <h1>보드 편집 · {board.slug}</h1>
       <p className="updated">
-        <Link href="/admin/boards">← 보드 목록</Link>
+        <Link href="/admin/boards">← 보드 목록</Link> &nbsp;|&nbsp;{" "}
+        <Link href={`/admin/boards/${board.slug}/posts`}>글 관리 →</Link>
       </p>
 
       <form action={updateBoard.bind(null, boardId)}>
