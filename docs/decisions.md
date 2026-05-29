@@ -91,3 +91,8 @@
 - **결정**: build.yml 트리거에 `tags: ['v*']` 추가. 이미지 태그를 ref 종류별로 — 브랜치 push → `:<short-sha>` + `:main|:develop`, `v*` 태그 push → `:<short-sha>` + `:v1.2.3` + `:latest`.
 - **이유**: short-sha 만으로는 R2 registry 의 `_manifests/tags/` 에서 "내가 푸시한 버전" 을 찾기 어려움 (날짜·브랜치·순서 정보 없음). git 태그명이 곧 이미지 태그가 되어 `_manifests/tags/v1.2.3/` 로 즉시 식별 가능. [[D-16]] 의 immutable short-sha pull 정책과 병행.
 - **영향**: 릴리즈 시 `git tag v1.2.3 && git push origin v1.2.3`. `meta.branch` output → `meta.ref` 로 정정(태그 push 때 의미 일치). `:latest` 는 v* 태그에서만 갱신되는 mutable 핸들. `environment: production` 이 태그 push 에도 적용되므로 승인 규칙 존재 시 태그 빌드도 대기.
+
+## D-19. Coolify 자동 배포 — GHA deploy API 트리거 — 2026-05-29
+- **결정**: v* 태그 push 시 GHA 가 빌드+push 완료 직후 Coolify deploy API(`GET /api/v1/deploy?uuid=...`)를 호출해 자동 배포. main 브랜치 트리거는 제거하고 태그 빌드가 `:main` 도 함께 부여(release 시 main+tag 이중 빌드 제거).
+- **이유**: 트리거 주체는 "registry 에 새 이미지가 올라온 걸 아는 자"여야 함 = GHA. GitHub git webhook 은 push(=빌드 전) 시점에 떠서 직전 이미지를 배포하는 race 존재. 또 기존 "자동 배포" 는 실제로 없었음 — webhook 미등록, 전 배포가 Manual 이었음. [[D-16]] 의 image tag PATCH 안은 캐시 대응이라 트리거와 분리.
+- **영향**: `COOLIFY_URL`/`COOLIFY_APP_UUID`/`COOLIFY_API_TOKEN` GHA secret + Coolify Settings 의 API 활성화(기본 off) 필요. 배포 이미지 반영 확인용 `/api/version`(빌드 sha/ref/시각 노출) 추가. `:latest` mutable 태그로도 캐시 문제 미발생 확인 → PATCH 안(D-16)은 보류, 재발 시 적용.
