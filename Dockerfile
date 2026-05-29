@@ -21,6 +21,14 @@ ENV NODE_OPTIONS=--max-old-space-size=1024
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
+# 빌드 식별자 — /api/version 으로 노출하여 배포 이미지 반영 여부 확인 (GHA build-args 로 주입)
+ARG APP_VERSION=dev
+ARG GIT_SHA=unknown
+ARG BUILD_TIME=unknown
+ENV APP_VERSION=$APP_VERSION
+ENV GIT_SHA=$GIT_SHA
+ENV BUILD_TIME=$BUILD_TIME
+
 RUN addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 nextjs
 
