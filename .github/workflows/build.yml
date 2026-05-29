@@ -2,7 +2,7 @@ name: build-and-push
 
 on:
   push:
-    branches: [main, develop]
+    branches: [develop]
     tags: ['v*']
   workflow_dispatch:
 
@@ -51,11 +51,12 @@ jobs:
           provenance: false
           sbom: false
           outputs: type=registry,oci-mediatypes=false
-          # build-push-action 은 빈 줄을 무시하므로 latest 가 아닐 때 3번째 줄은 자동 생략됨
+          # build-push-action 은 빈 줄을 무시하므로 latest 가 아닐 때 latest/main 줄은 자동 생략됨
           tags: |
             ${{ secrets.REGISTRY_URL }}/pixelwave-web:${{ steps.meta.outputs.sha }}
             ${{ secrets.REGISTRY_URL }}/pixelwave-web:${{ steps.meta.outputs.ref }}
             ${{ steps.meta.outputs.latest == 'true' && format('{0}/pixelwave-web:latest', secrets.REGISTRY_URL) || '' }}
+            ${{ steps.meta.outputs.latest == 'true' && format('{0}/pixelwave-web:main', secrets.REGISTRY_URL) || '' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
