@@ -43,16 +43,18 @@ curl -H 'Host: today-alive.pixelwave.app' -A 'iPhone' http://localhost:3100/invi
 ## 배포 흐름
 
 ```
-git push (main|develop)
+git push (main|develop 브랜치  또는  v* 태그)
   ↓
 GitHub Actions  (.github/workflows/build.yml)
   ↓ docker buildx (linux/amd64, OCI manifest off)
-registry.pixelwave.app/pixelwave-web:<short-sha>  +  :<branch>
+registry.pixelwave.app/pixelwave-web:<short-sha>  +  :<ref>
+  · 브랜치 push → :<short-sha> + :main|:develop
+  · v* 태그 push → :<short-sha> + :v1.2.3 + :latest
   ↓ docker pull
 Coolify (pixelwave-web 프로젝트) → Traefik LE → 4개 도메인
 ```
 
-자세한 인프라·결정 사항은 [`docs/migration-plan.md`](docs/migration-plan.md) 참고.
+현재 사양은 [`docs/spec-current.md`](docs/spec-current.md), 결정 기록은 [`docs/decisions.md`](docs/decisions.md), 향후 계획은 [`docs/roadmap.md`](docs/roadmap.md), 보류 작업은 [`docs/backlog.md`](docs/backlog.md).
 
 ## 디렉토리 구조
 
