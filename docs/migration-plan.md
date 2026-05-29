@@ -307,14 +307,14 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 **목표**: 멀티 보드 CRUD 의 최소 기능을 운영.
 
 작업:
-- [ ] `/admin` 에 보드 생성/편집 UI (slug, title, owner_site, 노출 사이트 체크박스).
-- [ ] `/admin` 에 글 작성/편집 UI (markdown textarea + 미리보기).
-- [ ] 공개 라우트:
-  - `pixelwave.app/b/[board]` → 글 목록
+- [x] `/admin` 에 보드 생성/편집 UI (slug, title, owner_site, 노출 사이트 체크박스). server action.
+- [x] `/admin` 에 글 작성/편집 UI (markdown textarea + 공개 토글). server action.
+- [x] 공개 라우트:
+  - `pixelwave.app/b/[board]` → 글 목록 (publishedAt 비null, desc 정렬)
   - `pixelwave.app/b/[board]/[post]` → 글 상세 (정본 URL)
-  - `<sub>.pixelwave.app/b/[board]` 및 `/[post]` → `board_sites` 화이트리스트 검사 후 SSR, canonical 은 허브로.
-- [ ] markdown 렌더 시 sanitize (예: `rehype-sanitize`).
-- [ ] 허브 랜딩(`pixelwave.app/`) 을 "최근 글" 인덱스로 교체. 기존 `_redirects` 의 invest-note 301 제거.
+  - `<sub>.pixelwave.app/b/[board]` 및 `/[post]` → `board_sites` inner join 으로 화이트리스트 검사. 통과 시 SSR, canonical 은 항상 허브 URL.
+- [x] markdown 렌더 시 sanitize — `rehype-sanitize` (unified pipeline).
+- [ ] 허브 랜딩 placeholder 그대로 (사용자 결정: hub redirect 유지). 4.5 skip.
 
 검증:
 - 보드 2~3개 생성, 각각 `owner_site` 다르게 설정.
@@ -393,3 +393,4 @@ REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
 - 2026-05-29: **Phase 4.1 완료.** admin 보드 CRUD 4 파일 + actions.ts. server action 으로 보드 생성/수정/삭제, board_sites 재구성 시 owner_site 자동 포함. 슬러그 형식 검증(`/^[a-z0-9]+(-[a-z0-9]+)*$/`). 로컬 dev 6건 curl 통과(가드 307·hub host /b 예외·회귀).
 - 2026-05-29: **Phase 4.2 완료.** admin 글 CRUD 4 파일 + actions.ts. src/lib/markdown.ts 에 unified(remark-parse → remark-rehype → rehype-sanitize → rehype-stringify) 파이프라인. `<script>alert(1)</script>` 가 단순 텍스트로 무력화 sanity 확인. publishedAt 토글로 공개/비공개.
 - 2026-05-29: **Phase 4.3 완료.** hub 의 공개 라우트 src/app/hub/b/[board]/page.tsx (목록 — publishedAt 비null 만, desc 정렬) + [board]/[post]/page.tsx (상세 — mdToSafeHtml + dangerouslySetInnerHTML 안전). canonical = hub URL. revalidate=60. dev curl: 없는 board/post 모두 404, 회귀 invest-note 200.
+- 2026-05-29: **Phase 4.4 완료. Phase 4 코드 종료.** src/lib/board-post.ts 의 site-aware loader 가 board_sites 와 inner join 으로 화이트리스트 동시 검사. invest-note·today-alive 각각 b/[board]/page.tsx + [post]/page.tsx (4 파일). canonical 메타는 모든 site 에서 동일하게 hub URL 출력. dev: 없는 board/post 모두 404, 회귀(랜딩·/invite) 통과. 실제 노출 검증(brower, 보드 2개·exposure sites 분리 설정)은 사용자 manual.
