@@ -12,12 +12,6 @@
 - [ ] **Postgres 튜닝값 적용** (Task #21). 트리거: 연결수/메모리 압박. §spec-current §4 + decisions D-04.
   - `shared_buffers=256MB`, `effective_cache_size=1GB`, `work_mem=8MB`, `maintenance_work_mem=64MB`, `max_connections=100`.
 - [ ] **백업 복구 리허설**. R2 의 dump 로 임시 Postgres 컨테이너에 restore → 최신 schema 와 비교. 트리거: 운영 데이터 들어온 직후.
-- [ ] **Coolify 자동 배포 (v* 태그 트리거)**. 트리거 조건: 위 `Phase 4 운영 적용` 류의 수동 Image Tag 갱신이 번거로워 재발 시 적용 (현재는 보류, 사용자 결정 2026-05-29).
-  - **목표**: v* 태그 push → GHA 가 Coolify 에 자동 배포. 매번 Image Tag 손수정 제거.
-  - **함정 (조사 완료 2026-05-29)**: deploy webhook 을 `force=true` 로 호출해도 **registry 최신 이미지를 pull 하지 않고 restart 만** 한다 (Coolify Issue #5318, v4.1.1 기준 open). UI 우상단 `Deploy ▾` → `Pull latest image(s) and restart` 는 수동 액션이라 webhook 자동화로는 대체 안 됨. 이게 D-16 캐시 현상의 원인으로 추정.
-  - **결론**: `latest`(mutable) 고정 + webhook 은 신뢰성 없음. **immutable 참조 자동 set** 만 견고함 — GHA 가 v* 태그 push 시 Coolify API 로 image tag 를 `:v1.2.3`(또는 digest) 로 PATCH → deploy 트리거. 매번 새 참조라 캐시 못 묾 (D-16 검증 경로).
-  - **구현 전 확인**: Coolify v4.1.1 의 정확한 API endpoint/필드명(image tag PATCH + deploy) 을 공식 문서로 확정. deploy 권한 API token + app UUID 를 GHA secret 으로.
-  - build.yml 의 `v*` 태그 트리거 + `:v1.2.3`/`:latest` 태깅은 이미 적용됨 (D-18).
 
 ## P3 — 기능 / 정책 (v1 이후)
 
@@ -33,6 +27,7 @@
 - [ ] (선택) CF Total TLS 또는 `*.invest-note.pixelwave.app` Advanced Certificate — `api.invest-note` 같은 2단계 서브 추가 시.
 - [ ] (선택) AUTH_SECRET 회전 정책 (예: 1년).
 - [ ] (선택) registry · R2 토큰 회전 정책.
+- [ ] **registry 레거시 철거** (D-20). Vultr 컷오버(`v*` 태그 배포 + `/api/version`·4도메인 검증) 후: 자체 `registry:2` 컨테이너 + R2 registry 버킷/`registry` 토큰 + Traefik 라우트 + `registry.pixelwave.app` CF DNS + htpasswd + Coolify 옛 자격증명 제거. **백업 R2(`pixelwave-backups`)는 제외.** 트리거: 컷오버 검증 완료.
 
 ## 종료된 항목 (참고)
 
@@ -40,3 +35,4 @@
 - README 갱신 (Coolify/Next.js 가이드)
 - public/*.svg 5개 제거
 - docs/migration-plan.md → 4 파일로 분리 (D-17)
+- Coolify 자동 배포 — v* 태그 push → GHA 가 빌드+push 후 deploy API 트리거 (D-19). main 트리거 제거로 이중 빌드 제거. 캐시(image tag PATCH)는 `:latest` 로도 미발생이라 보류. `/api/version` 으로 반영 검증.
