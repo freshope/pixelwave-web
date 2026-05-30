@@ -47,7 +47,7 @@ git push (main|develop 브랜치  또는  v* 태그)
   ↓
 GitHub Actions  (.github/workflows/build.yml)
   ↓ docker buildx (linux/amd64, OCI manifest off)
-registry.pixelwave.app/pixelwave-web:<short-sha>  +  :<ref>
+Vultr Container Registry  pixelwave-web:<short-sha>  +  :<ref>
   · 브랜치 push → :<short-sha> + :main|:develop
   · v* 태그 push → :<short-sha> + :v1.2.3 + :latest
   ↓ docker pull
@@ -77,5 +77,5 @@ next.config.ts              # output: 'standalone', .html → 깨끗 URL redirec
 
 - **호스트**: Coolify (자체 호스팅)
 - **DB**: 공유 Postgres (`postgres-shared`), 앱별 분리 DB/유저
-- **이미지 레지스트리**: 자체 호스팅 `registry.pixelwave.app` (Cloudflare R2 백엔드)
+- **이미지 레지스트리**: Vultr Container Registry (관리형, OCI 네이티브)
 - **DB 백업**: Cloudflare R2 `pixelwave-backups` daily, 14일 retention

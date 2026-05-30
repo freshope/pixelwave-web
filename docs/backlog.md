@@ -27,6 +27,7 @@
 - [ ] (선택) CF Total TLS 또는 `*.invest-note.pixelwave.app` Advanced Certificate — `api.invest-note` 같은 2단계 서브 추가 시.
 - [ ] (선택) AUTH_SECRET 회전 정책 (예: 1년).
 - [ ] (선택) registry · R2 토큰 회전 정책.
+- [ ] **registry 레거시 철거** (D-20). Vultr 컷오버(`v*` 태그 배포 + `/api/version`·4도메인 검증) 후: 자체 `registry:2` 컨테이너 + R2 registry 버킷/`registry` 토큰 + Traefik 라우트 + `registry.pixelwave.app` CF DNS + htpasswd + Coolify 옛 자격증명 제거. **백업 R2(`pixelwave-backups`)는 제외.** 트리거: 컷오버 검증 완료.
 
 ## 종료된 항목 (참고)
 
