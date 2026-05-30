@@ -53,11 +53,11 @@ jobs:
             APP_VERSION=${{ steps.meta.outputs.ref }}
             GIT_SHA=${{ steps.meta.outputs.sha }}
             BUILD_TIME=${{ steps.meta.outputs.build_time }}
-          # registry:2 가 buildx 의 OCI attestation/index manifest 를 거부해 "unknown: unknown error" 가 난다.
-          # provenance/sbom 끄고 + oci-mediatypes=false 로 docker schema2 단일 image manifest 만 push.
+          # Vultr CR 은 OCI 네이티브라 manifest 제약이 없다. provenance/sbom 은
+          # 10GB 무료 한도 절약 + manifest 단순화를 위해 끈 채로 둔다 (attestation 불필요).
           provenance: false
           sbom: false
-          outputs: type=registry,oci-mediatypes=false
+          outputs: type=registry
           # build-push-action 은 빈 줄을 무시하므로 latest 가 아닐 때 latest/main 줄은 자동 생략됨
           tags: |
             ${{ secrets.REGISTRY_URL }}/pixelwave-web:${{ steps.meta.outputs.sha }}
