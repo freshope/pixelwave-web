@@ -102,3 +102,4 @@
 - **이유**: registry:2 자체 운영(htpasswd·Traefik LE·R2 버킷/토큰)과 워크어라운드를 통째로 제거. OCI 네이티브라 [[D-12]]의 `oci-mediatypes=false` 불필요, R2 S3 백엔드가 사라져 [[D-13]]의 `CHUNKSIZE=100MB`도 무의미 → 둘 다 **supersede**. 비용은 $0 → $0 동일, 운영 단순화가 유일한 실익.
 - **트레이드오프**: 운영 단순화 ↑ vs 벤더 종속 ↑([[D-07]]의 "운영 종속 줄임" 의도와 역행). 이미지 재푸시가 쉬워 락인 위험은 낮음. 무료 티어는 문서상 "testing/learning/small-scale" 한정 — pull rate/egress 제한 여부는 컷오버 전 실측 필요.
 - **영향**: `build.yml` `outputs: type=registry,oci-mediatypes=false` → `type=registry`(provenance/sbom 은 10GB 절약 위해 off 유지). Coolify 이미지 host 변경 + Vultr 자격증명 등록. 검증 후 레거시 철거(registry:2·R2 registry 버킷/`registry` 토큰·Traefik·CF DNS·htpasswd·옛 `pixelwave-registry` 자격증명). **DB 백업 R2(`pixelwave-backups`, [[D-08]])는 별도 버킷/토큰이라 영향 없음 — 유지.**
+- **완료(2026-05-30)**: 컷오버 검증(`v0.1.9` 배포, `/api/version`·4도메인 정상) 후 레거시 전량 철거 — registry:2 컨테이너, R2 `pixelwave-registry` 버킷/`pixelwave-registry-rw` 토큰, `registry.pixelwave.app` 도메인·CF DNS, Coolify 자격증명(`docker logout`). 백업 R2 유지 확인.

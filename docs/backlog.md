@@ -27,10 +27,10 @@
 - [ ] (선택) CF Total TLS 또는 `*.invest-note.pixelwave.app` Advanced Certificate — `api.invest-note` 같은 2단계 서브 추가 시.
 - [ ] (선택) AUTH_SECRET 회전 정책 (예: 1년).
 - [ ] (선택) registry · R2 토큰 회전 정책.
-- [ ] **registry 레거시 철거** (D-20). Vultr 컷오버(`v*` 태그 배포 + `/api/version`·4도메인 검증) 후: 자체 `registry:2` 컨테이너 + R2 registry 버킷/`registry` 토큰 + Traefik 라우트 + `registry.pixelwave.app` CF DNS + htpasswd + Coolify 옛 자격증명 제거. **백업 R2(`pixelwave-backups`)는 제외.** 트리거: 컷오버 검증 완료.
 
 ## 종료된 항목 (참고)
 
+- registry 레거시 철거 (D-20, 2026-05-30). registry:2 컨테이너 + R2 `pixelwave-registry` 버킷/`pixelwave-registry-rw` 토큰 + `registry.pixelwave.app` 도메인/CF DNS + Coolify 자격증명(`docker logout`) 제거. 검증: DNS·registry API 죽음 + pixelwave-web `/api/version`·4도메인 정상. 백업 R2(`pixelwave-backups`)는 유지. 부수: 미사용 CF Pages 빌드 토큰 정리.
 - CF Pages/Workers 잔재 제거 (sites/, shared/, wrangler.jsonc 등)
 - README 갱신 (Coolify/Next.js 가이드)
 - public/*.svg 5개 제거

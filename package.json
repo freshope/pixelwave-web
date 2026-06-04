@@ -1,6 +1,6 @@
 {
   "name": "pixelwave-web",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "private": true,
   "packageManager": "pnpm@10.17.1",
   "scripts": {
