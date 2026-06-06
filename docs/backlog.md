@@ -4,6 +4,8 @@
 
 ## P1 — 트리거 곧
 
+- [ ] **today-alive 랜딩 이식**: Stitch 확정 HTML 보유(검토 통과) — invest-note(2026-06-06 완료)와 동일 흐름으로 이식. `docs/design.md` 브리프 2 + 이식 체크리스트 사용. 완료 시 레거시 랜딩 CSS(`.hero`/`.features`/`.store-badges`) 제거.
+- [ ] **오늘 하루 App Store 설명 문구 정비**: 스토어 설명의 "감정 정리·다짐 기록" 표현이 실제 앱 기능에 없음(2026-06-06 확인) — 과대광고/심사·신뢰 리스크. 체크인+안부 알림 중심으로 재작성.
 - [ ] **Phase 4 운영 적용**: release/v0.1.5 cut + main 머지 + push + Coolify Image Tag 새 sha 갱신 + Redeploy. 그 후 운영 admin 에서 보드/글 운영.
 - [ ] **CF Workers/Pages 콘솔 잔재 확인** — `pixelwave-hub`/`pixelwave-invest-note`/`pixelwave-today-alive` 프로젝트 (있다면) 삭제. _2026-05-29 사용자 처리 완료 보고._
 
