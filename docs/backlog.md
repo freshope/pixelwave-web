@@ -4,8 +4,7 @@
 
 ## P1 — 트리거 곧
 
-- [ ] **today-alive 랜딩 이식**: Stitch 확정 HTML 보유(검토 통과) — invest-note(2026-06-06 완료)와 동일 흐름으로 이식. `docs/design.md` 브리프 2 + 이식 체크리스트 사용. 완료 시 레거시 랜딩 CSS(`.hero`/`.features`/`.store-badges`) 제거.
-- [ ] **오늘 하루 App Store 설명 문구 정비**: 스토어 설명의 "감정 정리·다짐 기록" 표현이 실제 앱 기능에 없음(2026-06-06 확인) — 과대광고/심사·신뢰 리스크. 체크인+안부 알림 중심으로 재작성.
+- [ ] **오늘 하루 App Store 설명 문구 정비**: 스토어 설명의 "감정 정리·다짐 기록" 표현이 실제 앱 기능에 없음(2026-06-06 확인) — 과대광고/심사·신뢰 리스크. 체크인+안부 알림 중심으로 재작성. _랜딩이 데일리 체크인 포지셔닝으로 전환(2026-06-06)되어 스토어 설명과의 괴리가 커진 상태 — 우선 처리 권장._
 - [ ] **Phase 4 운영 적용**: release/v0.1.5 cut + main 머지 + push + Coolify Image Tag 새 sha 갱신 + Redeploy. 그 후 운영 admin 에서 보드/글 운영.
 - [ ] **CF Workers/Pages 콘솔 잔재 확인** — `pixelwave-hub`/`pixelwave-invest-note`/`pixelwave-today-alive` 프로젝트 (있다면) 삭제. _2026-05-29 사용자 처리 완료 보고._
 
@@ -18,6 +17,7 @@
 ## P3 — 기능 / 정책 (v1 이후)
 
 - [ ] hub 랜딩 "최근 글" 인덱스 (Phase 4.5). 현재 hub redirect 유지 결정 (D-15).
+- [ ] hub/login 버튼의 `.store-badges` 재사용 정리 — 랜딩용 클래스를 로그인 버튼이 차용 중(사실상 no-op 스타일). 전용 버튼 스타일로 교체 후 `.store-badges` 클래스 제거.
 - [ ] 댓글 기능. moderation 부담 큼 — 운영 수요 확인 후 진입.
 - [ ] 다중 작성자. `users.role` 확장, NextAuth 의 signIn 콜백 / 화이트리스트 로직 분리.
 - [ ] 이미지 업로드 외부화. v1 은 Coolify volume + Next.js 정적 서빙. R2/S3 이행은 트래픽/용량 임계 도달 시.
@@ -32,6 +32,7 @@
 
 ## 종료된 항목 (참고)
 
+- 랜딩 리디자인 양 도메인 이식 (2026-06-06). invest-note·today-alive 모두 Stitch 시안 → Tailwind v4 이식 완료 (spec-history 2026-06-06 2건). 레거시 랜딩 CSS 중 `.features`/`.feature` 제거 — `.hero` 는 hub placeholder, `.store-badges` 는 hub/login 이 사용 중이라 보존(P3 정리 항목 등록). today-alive metadata 는 데일리 체크인 포지셔닝으로 전환.
 - registry 레거시 철거 (D-20, 2026-05-30). registry:2 컨테이너 + R2 `pixelwave-registry` 버킷/`pixelwave-registry-rw` 토큰 + `registry.pixelwave.app` 도메인/CF DNS + Coolify 자격증명(`docker logout`) 제거. 검증: DNS·registry API 죽음 + pixelwave-web `/api/version`·4도메인 정상. 백업 R2(`pixelwave-backups`)는 유지. 부수: 미사용 CF Pages 빌드 토큰 정리.
 - CF Pages/Workers 잔재 제거 (sites/, shared/, wrangler.jsonc 등)
 - README 갱신 (Coolify/Next.js 가이드)
