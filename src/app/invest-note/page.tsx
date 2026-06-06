@@ -57,6 +57,8 @@ function StoreBadges({ justify }: { justify: string }) {
       <a
         href={APPSTORE_URL}
         aria-label="App Store 에서 받기"
+        target="_blank"
+        rel="noopener noreferrer"
         className="transition-transform active:scale-95"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -71,6 +73,8 @@ function StoreBadges({ justify }: { justify: string }) {
       <a
         href={PLAY_URL}
         aria-label="Google Play 에서 받기"
+        target="_blank"
+        rel="noopener noreferrer"
         className="transition-transform active:scale-95"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -318,15 +322,19 @@ export default function InvestNoteLandingPage() {
         </section>
       </div>
 
-      <div className="wrap-wide">
-        <Footer
-          siteName="pixelwave"
-          links={[
-            { href: "/privacy", label: "개인정보처리방침" },
-            { href: "/terms", label: "서비스 이용약관" },
-          ]}
-          supportEmail="support@pixelwave.app"
-        />
+      {/* 구분선은 풀블리드, 푸터 내용은 wrap-wide 폭 유지 */}
+      <div className="-mx-5 mt-16 border-t border-slate-200">
+        <div className="mx-auto max-w-[960px] px-5">
+          <Footer
+            className="mt-0 border-t-0"
+            siteName="pixelwave"
+            links={[
+              { href: "/privacy", label: "개인정보처리방침", newTab: true },
+              { href: "/terms", label: "서비스 이용약관", newTab: true },
+            ]}
+            supportEmail="support@pixelwave.app"
+          />
+        </div>
       </div>
     </main>
   );

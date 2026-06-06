@@ -126,23 +126,26 @@
   }
 }
 
-.site-footer {
-  margin-top: 64px;
-  padding-top: 24px;
-  border-top: 1px solid var(--color-border);
-  font-size: 0.85rem;
-  color: var(--color-fg-subtle);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 18px;
-  justify-content: space-between;
-}
-.site-footer nav a {
-  color: var(--color-fg-muted);
-  margin-right: 14px;
-}
-.site-footer nav a:last-child {
-  margin-right: 0;
+/* 컴포넌트 클래스도 레이어에 — 유틸리티로 페이지별 변형 가능 (D-21 과 동일 원리) */
+@layer components {
+  .site-footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.85rem;
+    color: var(--color-fg-subtle);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    justify-content: space-between;
+  }
+  .site-footer nav a {
+    color: var(--color-fg-muted);
+    margin-right: 14px;
+  }
+  .site-footer nav a:last-child {
+    margin-right: 0;
+  }
 }
 
 .hero {
