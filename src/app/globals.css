@@ -184,24 +184,3 @@
   background: var(--color-bg-soft);
   text-decoration: none;
 }
-
-.features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-  margin: 40px 0;
-}
-.feature {
-  padding: 20px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-bg);
-}
-.feature h3 {
-  margin-top: 0;
-}
-.feature p {
-  margin-bottom: 0;
-  color: var(--color-fg-muted);
-  font-size: 0.95rem;
-}
