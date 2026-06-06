@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Footer } from "@/components/Footer";
-import analysisShot from "../../../public/images/invest-note-analysis.png";
+import { Icon } from "@/components/Icon";
+import { StoreBadges } from "@/components/StoreBadges";
+import analysisShot from "../../../public/images/invest-note-analysis.webp";
 
 const TITLE = "투자노트 — 매매 기록과 포트폴리오 분석";
 const DESC =
@@ -25,70 +27,7 @@ export const metadata: Metadata = {
 
 const BRAND_BLUE = "text-[#0051d5]";
 const CARD =
-  "rounded-xl border border-slate-200 bg-white/80 p-8 backdrop-blur-sm transition-colors duration-300 hover:border-[#0051d5]";
-
-function Icon({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      {children}
-    </svg>
-  );
-}
-
-function StoreBadges({ justify }: { justify: string }) {
-  return (
-    <div className={`flex flex-wrap items-center gap-4 ${justify}`}>
-      <a
-        href={APPSTORE_URL}
-        aria-label="App Store 에서 받기"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="transition-transform active:scale-95"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/badges/app-store-ko.svg"
-          alt="App Store에서 다운로드"
-          width={156}
-          height={48}
-          className="h-12 w-auto"
-        />
-      </a>
-      <a
-        href={PLAY_URL}
-        aria-label="Google Play 에서 받기"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="transition-transform active:scale-95"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/badges/google-play-ko.png"
-          alt="Google Play에서 다운로드"
-          width={140}
-          height={54}
-          className="h-[54px] w-auto"
-        />
-      </a>
-    </div>
-  );
-}
+  "rounded-xl border border-slate-200 bg-white/80 p-8 transition-colors duration-300 hover:border-[#0051d5]";
 
 export default function InvestNoteLandingPage() {
   return (
@@ -109,7 +48,11 @@ export default function InvestNoteLandingPage() {
                 매매일지 앱
               </p>
               <div className="pt-4">
-                <StoreBadges justify="justify-center md:justify-start" />
+                <StoreBadges
+                  appStoreUrl={APPSTORE_URL}
+                  playUrl={PLAY_URL}
+                  justify="justify-center md:justify-start"
+                />
               </div>
             </div>
             <div className="relative flex-1">
@@ -316,7 +259,11 @@ export default function InvestNoteLandingPage() {
               투자노트와 함께 체계적인 투자 여정을 시작하세요.
             </p>
             <div className="pt-2">
-              <StoreBadges justify="justify-center" />
+              <StoreBadges
+                appStoreUrl={APPSTORE_URL}
+                playUrl={PLAY_URL}
+                justify="justify-center"
+              />
             </div>
           </div>
         </section>

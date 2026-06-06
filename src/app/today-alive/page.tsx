@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Footer } from "@/components/Footer";
-import checkinShot from "../../../public/images/today-alive-checkin.png";
+import { Icon } from "@/components/Icon";
+import { StoreBadges } from "@/components/StoreBadges";
+import checkinShot from "../../../public/images/today-alive-checkin.webp";
 
 const TITLE = "오늘 하루 — 하루 한 번 데일리 체크인";
 const DESC =
@@ -22,69 +24,6 @@ export const metadata: Metadata = {
     type: "website",
   },
 };
-
-function Icon({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      {children}
-    </svg>
-  );
-}
-
-function StoreBadges({ justify }: { justify: string }) {
-  return (
-    <div className={`flex flex-wrap items-center gap-4 ${justify}`}>
-      <a
-        href={APPSTORE_URL}
-        aria-label="App Store 에서 받기"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="transition-transform active:scale-95"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/badges/app-store-ko.svg"
-          alt="App Store에서 다운로드"
-          width={156}
-          height={48}
-          className="h-12 w-auto"
-        />
-      </a>
-      <a
-        href={PLAY_URL}
-        aria-label="Google Play 에서 받기"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="transition-transform active:scale-95"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/badges/google-play-ko.png"
-          alt="Google Play에서 다운로드"
-          width={140}
-          height={54}
-          className="h-[54px] w-auto"
-        />
-      </a>
-    </div>
-  );
-}
 
 const FEATURES = [
   {
@@ -145,7 +84,11 @@ export default function TodayAliveLandingPage() {
                 소중한 사람에게 안부가 됩니다.
               </p>
               <div className="pt-4">
-                <StoreBadges justify="justify-center lg:justify-start" />
+                <StoreBadges
+                  appStoreUrl={APPSTORE_URL}
+                  playUrl={PLAY_URL}
+                  justify="justify-center lg:justify-start"
+                />
               </div>
             </div>
             <div className="relative">
@@ -228,7 +171,11 @@ export default function TodayAliveLandingPage() {
               지금 바로 다운로드하고 당신의 소중한 일상을 안전하게 기록하세요.
             </p>
             <div className="pt-2">
-              <StoreBadges justify="justify-center" />
+              <StoreBadges
+                appStoreUrl={APPSTORE_URL}
+                playUrl={PLAY_URL}
+                justify="justify-center"
+              />
             </div>
           </div>
         </section>

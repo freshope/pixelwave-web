@@ -15,8 +15,8 @@ backlog P1 항목. invest-note(2026-06-06 완료)와 동일 흐름 — Stitch �
   - TITLE: `오늘 하루 — 하루 한 번 데일리 체크인`
   - DESC: `하루 한 번 버튼으로 오늘을 기록하세요. 체크인이 끊기면 지정한 연락처로 안부 메시지를 보내는 안전장치를 제공합니다.`
 - invest-note 에서 확정된 후속 수정 동일 적용: 푸터 구분선 풀블리드, 스토어 배지·법무 링크 새창(`newTab`).
-- **레거시 랜딩 CSS 제거**: 양쪽 랜딩 이식 완료 조건 충족 → `globals.css` 의 `.features`/`.feature`/`.store-badges` 제거.
-  단, `.hero`(+`.lede`)는 **hub placeholder(`src/app/hub/page.tsx`)가 사용 중이므로 유지**.
+- **레거시 랜딩 CSS 제거**: 양쪽 랜딩 이식 완료 조건 충족 → `globals.css` 의 `.features`/`.feature` 제거.
+  단, `.hero`(+`.lede`)는 **hub placeholder(`src/app/hub/page.tsx`)가 사용 중**, `.store-badges`는 **hub 로그인(`src/app/hub/login/page.tsx`)이 사용 중이므로 유지**.
 - invest-note·hub·법무 페이지 렌더링이 변하지 않는다.
 
 ## 설계
@@ -34,13 +34,13 @@ backlog P1 항목. invest-note(2026-06-06 완료)와 동일 흐름 — Stitch �
 
 2. **에셋**: `~/Downloads/스크린샷/오늘하루/400x800bb (1).png`(따뜻한 방 + "오늘 하루" 체크인 버튼, 370×800) → `public/images/today-alive-checkin.png` 복사. `next/image` static import. 저해상도라 표시폭 ~300px 이하 유지.
 
-3. **레거시 CSS 제거**: 이식 후 `grep` 으로 `.features`/`.feature`/`.store-badges` 사용처 0건 확인 → `globals.css` 에서 해당 블록 삭제. `.hero` 계열은 hub 사용 중이라 보존.
+3. **레거시 CSS 제거**: 이식 후 `grep` 으로 `.features`/`.feature` 사용처 0건 확인 → `globals.css` 에서 해당 블록 삭제. `.hero` 계열(hub)과 `.store-badges`(hub 로그인 버튼)는 사용 중이라 보존.
 
 ### 주요 변경 파일
 
 - `src/app/today-alive/page.tsx` — 전면 재작성 (서버 컴포넌트, metadata 갱신 포함)
 - `public/images/today-alive-checkin.png` — 신규 에셋
-- `src/app/globals.css` — `.features`/`.feature`/`.store-badges` 블록 제거
+- `src/app/globals.css` — `.features`/`.feature` 블록 제거 (`.store-badges`는 hub 로그인 사용 중이라 보존)
 - `docs/spec-current.md` — 본 사양서 저장
 
 ## 구현 체크리스트
