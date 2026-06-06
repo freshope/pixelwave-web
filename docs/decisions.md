@@ -103,3 +103,9 @@
 - **트레이드오프**: 운영 단순화 ↑ vs 벤더 종속 ↑([[D-07]]의 "운영 종속 줄임" 의도와 역행). 이미지 재푸시가 쉬워 락인 위험은 낮음. 무료 티어는 문서상 "testing/learning/small-scale" 한정 — pull rate/egress 제한 여부는 컷오버 전 실측 필요.
 - **영향**: `build.yml` `outputs: type=registry,oci-mediatypes=false` → `type=registry`(provenance/sbom 은 10GB 절약 위해 off 유지). Coolify 이미지 host 변경 + Vultr 자격증명 등록. 검증 후 레거시 철거(registry:2·R2 registry 버킷/`registry` 토큰·Traefik·CF DNS·htpasswd·옛 `pixelwave-registry` 자격증명). **DB 백업 R2(`pixelwave-backups`, [[D-08]])는 별도 버킷/토큰이라 영향 없음 — 유지.**
 - **완료(2026-05-30)**: 컷오버 검증(`v0.1.9` 배포, `/api/version`·4도메인 정상) 후 레거시 전량 철거 — registry:2 컨테이너, R2 `pixelwave-registry` 버킷/`pixelwave-registry-rw` 토큰, `registry.pixelwave.app` 도메인·CF DNS, Coolify 자격증명(`docker logout`). 백업 R2 유지 확인.
+
+## D-21. globals.css 베이스 스타일 @layer base 이동 — 2026-06-06
+- **결정**: `globals.css` 의 엘리먼트 셀렉터 스타일(`*` reset, `html`, `body`, `h1~h3`, `p`, `ul/ol/li`, `a`, `table/th/td`, `hr`)을 `@layer base` 로 래핑. 값 변경 없음. 클래스 셀렉터(`.wrap`, `.hero`, `.site-footer` 등)는 unlayered 유지.
+- **이유**: CSS 캐스케이드 규칙상 unlayered 스타일이 레이어드 스타일을 항상 이김 → Tailwind 유틸리티(`@layer utilities`)가 엘리먼트 베이스에 영원히 패배. 랜딩 리디자인(유틸리티 기반)에서 `text-5xl` 등이 무효가 되는 문제의 근본 원인. `@layer base` 로 넣으면 유틸리티가 정상 우선.
+- **트레이드오프**: 향후 유틸리티를 쓰는 페이지에서 베이스 스타일 의존이 약해짐(의도된 동작). 기존 페이지는 전수 시맨틱 클래스만 사용(유틸리티 0건 — grep 확인)이라 렌더링 불변. `/invest-note/privacy`·`/hub` 스크린샷 검증 완료.
+- **영향**: 랜딩 페이지를 Tailwind 유틸리티로 작성 가능. 신규 엘리먼트 베이스 스타일 추가 시 반드시 `@layer base` 블록 안에 작성.
