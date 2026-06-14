@@ -13,7 +13,7 @@ export default function InvestNotePrivacyPage() {
     <div className="wrap">
       <h1>개인정보처리방침</h1>
       <p className="updated">
-        시행일: 2026년 5월 19일 &nbsp;|&nbsp; 최종 수정: 2026년 5월 19일
+        시행일: 2026년 6월 14일 &nbsp;|&nbsp; 최종 수정: 2026년 6월 14일
       </p>
 
       <p>
@@ -56,6 +56,15 @@ export default function InvestNotePrivacyPage() {
             </td>
             <td>이용자 직접 입력</td>
             <td>투자 기록 관리</td>
+          </tr>
+          <tr>
+            <td>
+              서비스 이용 기록
+              <br />
+              (페이지 방문, 기능 이용 이벤트, 접속 IP 등)
+            </td>
+            <td>서비스 이용 시 분석 도구를 통해 자동 수집</td>
+            <td>서비스 이용 통계 산출 및 기능 개선</td>
           </tr>
         </tbody>
       </table>
@@ -125,6 +134,11 @@ export default function InvestNotePrivacyPage() {
             <td>도메인·DNS·정적 페이지 호스팅·이메일 라우팅</td>
             <td>서비스 이용 기간</td>
           </tr>
+          <tr>
+            <td>PostHog, Inc.</td>
+            <td>서비스 이용 통계 분석(제품 분석)</td>
+            <td>각 사 정책에 따름</td>
+          </tr>
         </tbody>
       </table>
 
@@ -148,7 +162,16 @@ export default function InvestNotePrivacyPage() {
       <h2>8. 쿠키 및 자동 수집 도구</h2>
       <p>
         서비스는 로그인 세션 유지 목적으로 기기 로컬 스토리지(localStorage)를
-        사용합니다. 별도의 행태 분석·광고 추적 쿠키는 사용하지 않습니다.
+        사용합니다. 광고 추적 쿠키는 사용하지 않습니다.
+      </p>
+      <p>
+        서비스 개선을 위해 제품 분석 도구인 PostHog를 사용합니다. PostHog는
+        쿠키가 아닌 localStorage 기반으로 동작하며, 페이지 방문 기록과 주요
+        기능 이용 이벤트, 접속 IP 등 이용 통계를 수집합니다. 이때 거래 금액,
+        종목명, 수량, 계좌명, 이메일 등 민감·식별 정보는 전송 전에 제거되어
+        수집되지 않으며, 화면 녹화(세션 리코딩) 및 화면 요소 자동 수집
+        (autocapture) 기능은 사용하지 않습니다. 사용자는 서비스 탈퇴 시
+        분석용 식별자가 함께 초기화됩니다.
       </p>
 
       <h2>9. 개인정보 보호책임자</h2>

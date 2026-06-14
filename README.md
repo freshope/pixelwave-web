@@ -54,7 +54,7 @@ Vultr Container Registry  pixelwave-web:<short-sha>  +  :<ref>
 Coolify (pixelwave-web 프로젝트) → Traefik LE → 4개 도메인
 ```
 
-현재 사양은 [`docs/spec-current.md`](docs/spec-current.md), 결정 기록은 [`docs/decisions.md`](docs/decisions.md), 향후 계획은 [`docs/roadmap.md`](docs/roadmap.md), 보류 작업은 [`docs/backlog.md`](docs/backlog.md).
+현재 사양은 [`docs/issue-current.md`](docs/issue-current.md), 결정 기록은 [`docs/decisions.md`](docs/decisions.md), 향후 계획은 [`docs/roadmap.md`](docs/roadmap.md), 보류 작업은 [`docs/backlog.md`](docs/backlog.md).
 
 ## 디렉토리 구조
 

@@ -10,7 +10,7 @@
 
 ## P2 — 운영 안정성
 
-- [ ] **Postgres 튜닝값 적용** (Task #21). 트리거: 연결수/메모리 압박. §spec-current §4 + decisions D-04.
+- [ ] **Postgres 튜닝값 적용** (Task #21). 트리거: 연결수/메모리 압박. §issue-current §4 + decisions D-04.
   - `shared_buffers=256MB`, `effective_cache_size=1GB`, `work_mem=8MB`, `maintenance_work_mem=64MB`, `max_connections=100`.
 - [ ] **백업 복구 리허설**. R2 의 dump 로 임시 Postgres 컨테이너에 restore → 최신 schema 와 비교. 트리거: 운영 데이터 들어온 직후.
 
@@ -21,7 +21,7 @@
 - [ ] 댓글 기능. moderation 부담 큼 — 운영 수요 확인 후 진입.
 - [ ] 다중 작성자. `users.role` 확장, NextAuth 의 signIn 콜백 / 화이트리스트 로직 분리.
 - [ ] 이미지 업로드 외부화. v1 은 Coolify volume + Next.js 정적 서빙. R2/S3 이행은 트래픽/용량 임계 도달 시.
-- [ ] 사양 업그레이드 4GB→8GB. §spec-current §6 의 서버 사양 표 참고.
+- [ ] 사양 업그레이드 4GB→8GB. §issue-current §6 의 서버 사양 표 참고.
 
 ## P4 — 보안 / 인프라
 
@@ -32,7 +32,7 @@
 
 ## 종료된 항목 (참고)
 
-- 랜딩 리디자인 양 도메인 이식 (2026-06-06). invest-note·today-alive 모두 Stitch 시안 → Tailwind v4 이식 완료 (spec-history 2026-06-06 2건). 레거시 랜딩 CSS 중 `.features`/`.feature` 제거 — `.hero` 는 hub placeholder, `.store-badges` 는 hub/login 이 사용 중이라 보존(P3 정리 항목 등록). today-alive metadata 는 데일리 체크인 포지셔닝으로 전환.
+- 랜딩 리디자인 양 도메인 이식 (2026-06-06). invest-note·today-alive 모두 Stitch 시안 → Tailwind v4 이식 완료 (issue-history 2026-06-06 2건). 레거시 랜딩 CSS 중 `.features`/`.feature` 제거 — `.hero` 는 hub placeholder, `.store-badges` 는 hub/login 이 사용 중이라 보존(P3 정리 항목 등록). today-alive metadata 는 데일리 체크인 포지셔닝으로 전환.
 - registry 레거시 철거 (D-20, 2026-05-30). registry:2 컨테이너 + R2 `pixelwave-registry` 버킷/`pixelwave-registry-rw` 토큰 + `registry.pixelwave.app` 도메인/CF DNS + Coolify 자격증명(`docker logout`) 제거. 검증: DNS·registry API 죽음 + pixelwave-web `/api/version`·4도메인 정상. 백업 R2(`pixelwave-backups`)는 유지. 부수: 미사용 CF Pages 빌드 토큰 정리.
 - CF Pages/Workers 잔재 제거 (sites/, shared/, wrangler.jsonc 등)
 - README 갱신 (Coolify/Next.js 가이드)
