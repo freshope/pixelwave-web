@@ -2,20 +2,15 @@
 
 > 큰 그림. 우선순위 마감일은 두지 않고, 트리거 기반으로 진입.
 
-## 현재 (2026-05-29)
+## 현재 (2026-06-14)
 
 - 운영 인입: pixelwave.app · www · invest-note · today-alive 모두 Coolify Traefik
-- 운영 코드: release/v0.1.4 (`beabc9e`) — Phase 3 까지. admin 로그인 / `/b/...` 라우트 코드는 아직 운영 미적용 (Phase 4, `develop` HEAD).
-- 게시판 v1 의 운영 콘텐츠 0건.
+- 운영 코드: release/v0.2.2 — 게시판 v1(Phase 4) 운영 적용 완료. admin 로그인 / `/b/...` 공개 라우트 + board_sites 화이트리스트 운영 반영.
+- 이후 반영: 이미지 레지스트리 Vultr 이전(v0.1.9, registry 레거시 철거), `/api/version` 엔드포인트, invest-note·today-alive 랜딩 리디자인(v0.2.0) + 라우트별 파비콘(v0.2.1), PostHog 도입 + 개인정보처리방침 갱신(v0.2.2).
 
-## 다음 마일스톤 — release/v0.1.5
+## 다음 마일스톤
 
-게시판 v1 운영 적용. 트리거: 사용자가 보드 운영 의향 결정.
-
-- [ ] `develop` → release/v0.1.5 cut → main 머지 + tag
-- [ ] Coolify Image Tag 새 sha 로 갱신 + Redeploy
-- [ ] 운영 admin (`https://pixelwave.app/admin`) 에서 첫 보드/글 생성
-- [ ] 외부에서 정본/서브도메인 노출 확인 (canonical + 화이트리스트)
+현재 트리거된 마일스톤 없음 — 아래 "그 이후" 트리거 표 기반으로 진입.
 
 ## 그 이후 — 트리거 발생 시 진입
 
