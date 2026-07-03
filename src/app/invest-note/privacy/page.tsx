@@ -13,7 +13,7 @@ export default function InvestNotePrivacyPage() {
     <div className="wrap">
       <h1>개인정보처리방침</h1>
       <p className="updated">
-        시행일: 2026년 6월 14일 &nbsp;|&nbsp; 최종 수정: 2026년 6월 14일
+        시행일: 2026년 6월 14일 &nbsp;|&nbsp; 최종 수정: 2026년 7월 3일
       </p>
 
       <p>
@@ -35,9 +35,14 @@ export default function InvestNotePrivacyPage() {
         </thead>
         <tbody>
           <tr>
-            <td>이메일 주소</td>
+            <td>
+              계정·프로필 정보
+              <br />
+              (이메일 주소, 이름·프로필 사진, 소셜 로그인 제공자, 이메일 인증
+              여부, 가입일시, 최근 로그인 일시)
+            </td>
             <td>소셜 로그인(Google, Apple, Kakao) 인증 시 자동 수집</td>
-            <td>계정 식별 및 로그인</td>
+            <td>계정 식별·로그인 및 프로필 표시</td>
           </tr>
           <tr>
             <td>
