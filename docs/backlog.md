@@ -2,12 +2,6 @@
 
 > 우선순위 / 트리거 / 분류로 묶은 후속 작업 큐. 마감일은 두지 않는다.
 
-## P1 — 트리거 곧
-
-- [ ] **오늘 하루 App Store 설명 문구 정비**: 스토어 설명의 "감정 정리·다짐 기록" 표현이 실제 앱 기능에 없음(2026-06-06 확인) — 과대광고/심사·신뢰 리스크. 체크인+안부 알림 중심으로 재작성. _랜딩이 데일리 체크인 포지셔닝으로 전환(2026-06-06)되어 스토어 설명과의 괴리가 커진 상태 — 우선 처리 권장._
-- [ ] **Phase 4 운영 적용**: release/v0.1.5 cut + main 머지 + push + Coolify Image Tag 새 sha 갱신 + Redeploy. 그 후 운영 admin 에서 보드/글 운영.
-- [ ] **CF Workers/Pages 콘솔 잔재 확인** — `pixelwave-hub`/`pixelwave-invest-note`/`pixelwave-today-alive` 프로젝트 (있다면) 삭제. _2026-05-29 사용자 처리 완료 보고._
-
 ## P2 — 운영 안정성
 
 - [ ] **Postgres 튜닝값 적용** (Task #21). 트리거: 연결수/메모리 압박. §issue-current §4 + decisions D-04.

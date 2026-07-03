@@ -205,8 +205,8 @@ export default function TodayAliveTermsPage() {
       <h2>11. 책임의 제한</h2>
       <ul>
         <li>
-          운영자는 천재지변, 통신·전력 장애, 제3자(Supabase·SOLAPI·Google·Apple
-          등 위탁업체)의 서비스 장애로 인한 손해에 대해 책임지지 않습니다.
+          운영자는 천재지변, 통신·전력 장애, 제3자(SOLAPI·Google·Apple 등
+          위탁업체)의 서비스 장애로 인한 손해에 대해 책임지지 않습니다.
         </li>
         <li>
           운영자는 위급 메시지 발송의 시점·도달·결과로 인해 발생한 손해(신체적

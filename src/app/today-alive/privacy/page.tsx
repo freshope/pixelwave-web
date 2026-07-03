@@ -160,8 +160,8 @@ export default function TodayAlivePrivacyPage() {
         </thead>
         <tbody>
           <tr>
-            <td>Supabase, Inc.</td>
-            <td>데이터베이스 저장 및 인증 인프라 운영</td>
+            <td>Vultr Holdings Corporation</td>
+            <td>서버 호스팅(클라우드 인프라) 운영</td>
             <td>서비스 이용 기간</td>
           </tr>
           <tr>
@@ -202,7 +202,7 @@ export default function TodayAlivePrivacyPage() {
       <h2>8. 개인정보의 안전성 확보 조치</h2>
       <ul>
         <li>모든 데이터 전송은 HTTPS(TLS)로 암호화</li>
-        <li>Supabase Row Level Security(RLS)를 통한 디바이스별 데이터 격리</li>
+        <li>애플리케이션 레벨 접근 제어를 통한 디바이스별 데이터 격리</li>
         <li>
           SMS 게이트웨이 호출은 서버 측에서만 수행, API 키는 서버 환경 변수로만
           보관
