@@ -110,8 +110,8 @@ export default function InvestNotePrivacyPage() {
         </thead>
         <tbody>
           <tr>
-            <td>Supabase, Inc.</td>
-            <td>데이터베이스 저장·인증 인프라 운영</td>
+            <td>Vultr Holdings Corporation</td>
+            <td>서버 호스팅(클라우드 인프라) 운영</td>
             <td>서비스 이용 기간</td>
           </tr>
           <tr>
@@ -155,7 +155,7 @@ export default function InvestNotePrivacyPage() {
       <h2>7. 개인정보의 안전성 확보 조치</h2>
       <ul>
         <li>모든 데이터 전송은 HTTPS(TLS)로 암호화</li>
-        <li>Supabase Row Level Security(RLS)를 통한 계정별 데이터 격리</li>
+        <li>애플리케이션 레벨 접근 제어를 통한 계정별 데이터 격리</li>
         <li>서버 접근 권한 최소화 및 주기적 점검</li>
       </ul>
 
